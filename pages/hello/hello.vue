@@ -1,5 +1,5 @@
 <template lang="">
-  <div>Hello</div>
+  <div>Hello World</div>
 </template>
 <script>
 export default {}
