@@ -1,5 +1,21 @@
+<script setup>
+const { message, errorMsg } = useAppState()
+const hideSnackbar = () => {
+  errorMsg.value = null
+  message.value = null
+}
+</script>
 <template>
   <div>
-    <NuxtPage />
+    <NuxtLayout>
+      <NuxtPage />
+      <SnackBar
+        :show="errorMsg ? true : message ? true : false"
+        :message="errorMsg ? errorMsg : message ? message : ''"
+        :snackbarType="errorMsg ? 'Error' : 'Success'"
+        duration="0"
+        @hideSnackbar="hideSnackbar"
+      />
+    </NuxtLayout>
   </div>
 </template>
