@@ -11,7 +11,7 @@ const fetchData = async () => {
 <template>
   <div>
     <button @click="fetchData">Fetch Data</button>
-    <img src="http://localhost:5000/uploads/1653562126299-Pastels-1024x697.webp" />
+    <img :src="`${config.apiUrl}/uploads/1653562126299-Pastels-1024x697.webp`" />
     <!-- {{ data }} -->
   </div>
 </template>
