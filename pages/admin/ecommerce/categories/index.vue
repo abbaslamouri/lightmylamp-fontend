@@ -1,15 +1,13 @@
 <script setup>
-const title = ref('Signup | YRL')
-
-// useMeta({
-//   title: 'Categories | YRL',
-// })
 definePageMeta({
   layout: 'admin',
 })
+const title = ref('Categories | YRL')
+
+const config = useRuntimeConfig()
 
 // const router = useRouter()
-const { errorMsg, message, alert, fetchAll, deleteById } = useFactory()
+const { errorMsg, message } = useAppState()
 
 const categories = ref([])
 const categoryToDeleteId = ref(null)
@@ -35,30 +33,46 @@ const params = computed(() => {
     indexPage: true,
   }
 })
+const {
+  data,
+  pending: loading,
+  error,
+} = await useFetch(`${config.apiUrl}/categories/`, {
+  method: 'GET',
+})
+if (error.value && error.value.data) {
+  console.log('MYERROR', error.value.data)
+  errorMsg.value = ''
+  for (const prop in error.value.data.errors) {
+    errorMsg.value = `${errorMsg.value}<li>${error.value.data.errors[prop].message}</li>`
+  }
+  errorMsg.value = `<ul>${errorMsg.value}</ul>`
+}
+console.log(data.value)
 
 // Fetch all
-response = await fetchAll('categories', params.value)
+// response = await fetchAll('categories', params.value)
 
-categories.value = response.docs
-count.value = response.count
-totalCount.value = response.totalCount
-console.log(categories.value)
-const topLevel = categories.value.filter((c) => !c.parent)
-for (const i in topLevel) {
-  topLevel[i].children = categories.value.filter((c) => c.parent && c.parent._id == topLevel[i]._id)
-  for (const j in topLevel[i].children) {
-    topLevel[i].children[j].children = categories.value.filter(
-      (c) => c.parent && c.parent._id == topLevel[i].children[j]._id
-    )
-    for (const k in topLevel[i].children[j].children)
-      topLevel[i].children[j].children[k].children = categories.value.filter(
-        (c) => c.parent && c.parent._id == topLevel[i].children[j].children[k]._id
-      )
-  }
-}
+// categories.value = response.docs
+// count.value = response.count
+// totalCount.value = response.totalCount
+// console.log(categories.value)
+// const topLevel = categories.value.filter((c) => !c.parent)
+// for (const i in topLevel) {
+//   topLevel[i].children = categories.value.filter((c) => c.parent && c.parent._id == topLevel[i]._id)
+//   for (const j in topLevel[i].children) {
+//     topLevel[i].children[j].children = categories.value.filter(
+//       (c) => c.parent && c.parent._id == topLevel[i].children[j]._id
+//     )
+//     for (const k in topLevel[i].children[j].children)
+//       topLevel[i].children[j].children[k].children = categories.value.filter(
+//         (c) => c.parent && c.parent._id == topLevel[i].children[j].children[k]._id
+//       )
+//   }
+// }
 
-categories.value = topLevel
-console.log('PPPPP', categories.value)
+// categories.value = topLevel
+// console.log('PPPPP', categories.value)
 
 const setPage = async (currentPage) => {
   page.value = currentPage
@@ -98,13 +112,13 @@ const showAlert = (heading, paragraph, action, showCancelBtn) => {
   alert.value.show = true
 }
 
-watch(
-  () => alert.value.show,
-  (currentVal) => {
-    if (currentVal === 'ok' && alert.value.action === 'deleteCategory') deleteCategory()
-  }
-  // { deep: true }
-)
+// watch(
+//   () => alert.value.show,
+//   (currentVal) => {
+//     if (currentVal === 'ok' && alert.value.action === 'deleteCategory') deleteCategory()
+//   }
+//   // { deep: true }
+// )
 </script>
 
 <template>
@@ -118,9 +132,9 @@ watch(
     </header>
     <main class="flex-1 max-width-130 w-full flex-col gap3">
       <div class="flex-col gap3 flex-col br5">
-        <div class="border-b-slate-300 p2" v-if="totalCount">
-          <!-- <Search @searchKeywordSelected="handleSearch" /> -->
-        </div>
+        <!-- <div class="border-b-slate-300 p2" v-if="totalCount"> -->
+        <!-- <Search @searchKeywordSelected="handleSearch" /> -->
+        <!-- </div> -->
         <!-- <EcommerceAdminCategoriesList
           :categories="categories"
           :totalCount="totalCount"
