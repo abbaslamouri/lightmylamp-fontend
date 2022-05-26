@@ -1,8 +1,12 @@
 <script setup>
+definePageMeta({
+  layout: 'admin',
+})
 const title = ref('Signup | YRL')
 const config = useRuntimeConfig()
 const router = useRouter()
 const { signup } = useAuth()
+const { errorMsg, message } = useAppState()
 const user = reactive({
   name: 'Abbas Lamouri',
   email: 'abbaslamouri@yrlus.com',
@@ -10,7 +14,7 @@ const user = reactive({
   passwordConfirm: 'adrar0714',
 })
 const loading = ref(false)
-const errorMsg = ref('')
+// const errorMsg = ref('')
 
 const register = async () => {
   if (user.password !== user.passwordConfirm)
@@ -20,7 +24,7 @@ const register = async () => {
     data,
     pending: loading,
     error,
-  } = await useFetch(`${config.apiUrl}/v1/auth/signup`, {
+  } = await useFetch(`${config.apiUrl}/auth/signup`, {
     method: 'POST',
     body: { ...user },
   })
@@ -28,8 +32,10 @@ const register = async () => {
     console.log('MYERROR', error.value.data)
     errorMsg.value = ''
     for (const prop in error.value.data.errors) {
-      errorMsg.value = `<li>${error.value.data.errors[prop].message}</li>`
+      errorMsg.value = `${errorMsg.value}<li>${error.value.data.errors[prop].message}</li>`
     }
+    if (errorMsg.value.includes('already exists'))
+      errorMsg.value = `${errorMsg.value}<li>or click the link below to reset your password</li>`
     errorMsg.value = `<ul>${errorMsg.value}</ul>`
   }
   console.log(data.value)
@@ -45,13 +51,11 @@ const register = async () => {
 
   // message.value = `Email sent to ${user.email}.  Please follow the link in your email to complete your registration.  Submit a PATCH request with email and password to  ${url} to complete the registration`,
   // // url,
-
-  // router.push({ name: 'auth-emailsent' })
 }
 </script>
 
 <template>
-  <div class="h-100vh flex-1 bg-slate-900 flex-row justify-center items-start pt-10">
+  <div class="h-100vh flex-1 bg-slate-700 flex-row justify-center items-start pt-10">
     <Title>{{ title }}</Title>
     <div class="bg-slate-50 p-4 br-3 flex-row gap-2 w-996p">
       <div class="flex-col gap-1 min-w-30">
@@ -66,9 +70,9 @@ const register = async () => {
         </div>
       </div>
       <form class="flex-col gap-1" @submit.prevent="register">
-        <div class="bg-red-100 p-2 br-3 text-xs flex-col gap-1" v-if="errorMsg">
-          <div v-html="errorMsg"></div>
-          <NuxtLink class="link items-self-end" :to="{ name: 'auth-forgotpassword' }">
+        <div class="p-2 br-3 text-xs flex-col gap-1" v-if="errorMsg">
+          <!-- <div v-html="errorMsg"></div> -->
+          <NuxtLink class="link items-self-end text-md" :to="{ name: 'auth-forgotpassword' }">
             <span>Reset Password</span>
             <IconsChevronRight />
           </NuxtLink>
@@ -87,7 +91,7 @@ const register = async () => {
           By clicking on “continue” you acknowledge that you have read and agree with YRL Privacy Notice & Terms of
           Service.
         </p>
-        pending========{{ loading }}
+        <!-- pending========{{ loading }} -->
         <button class="btn btn__primary py-05 px-1 items-self-end">Continue<IconsChevronRight /></button>
       </form>
     </div>
