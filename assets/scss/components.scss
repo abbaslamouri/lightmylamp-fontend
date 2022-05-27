@@ -39,24 +39,36 @@
 .btn {
   display: flex;
   align-items: center;
-  // justify-content: center;
-  // gap: 1rem;
+  gap: 1rem;
   background-color: transparent;
   border: 1px solid transparent;
   color: inherit;
   text-transform: uppercase;
-  // padding: 1rem 2rem;
   border-radius: 3px;
   cursor: pointer;
   transition: 0.3s ease-in-out;
 
-  &:hover {
-    background-color: $slate-50;
-    // color: $slate-800;
+  &__primary {
+    background-color: $slate-800;
+    color: $slate-50;
+    &:hover {
+      background-color: $slate-600;
+      color: $slate-50;
+    }
+    svg {
+      fill: $slate-50;
+      width: 2rem;
+      height: 2rem;
+    }
   }
 
   &__pill {
     border-radius: 5rem;
+  }
+
+  &:hover {
+    // background-color: $slate-50;
+    // color: $slate-800;
   }
 
   &__primary {

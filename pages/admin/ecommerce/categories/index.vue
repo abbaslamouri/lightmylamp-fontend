@@ -13,15 +13,17 @@ const categories = ref([])
 const categoryToDeleteId = ref(null)
 const count = ref(null) // item count taking into account params
 const totalCount = ref(null) // Total item count in the database
-const keyword = ref(null)
+const keyword = ref('')
 const page = ref(1)
-const perPage = ref(8)
+const perPage = ref(4)
 const sortField = ref('createdAt')
 const sortOrder = ref('-')
 let response = null
 
 const pages = computed(() =>
-  count.value % perPage.value ? parseInt(count.value / perPage.value) + 1 : parseInt(count.value / perPage.value)
+  totalCount.value % perPage.value
+    ? parseInt(totalCount.value / perPage.value) + 1
+    : parseInt(totalCount.value / perPage.value)
 )
 
 const params = computed(() => {
@@ -30,32 +32,48 @@ const params = computed(() => {
     limit: perPage.value,
     sort: `${sortOrder.value}${sortField.value}`,
     keyword: keyword.value,
-    indexPage: true,
   }
 })
-const {
-  data,
-  pending: loading,
-  error,
-} = await useFetch(`${config.apiUrl}/categories/`, {
+
+const esc = encodeURIComponent
+const query = Object.keys(params.value)
+  .map((k) => esc(k) + '=' + esc(params.value[k]))
+  .join('&')
+
+console.log('ESC', esc)
+console.log('QUERY', query)
+
+response = await fetch(`${config.apiUrl}/categories?${query}`, {
   method: 'GET',
 })
-if (error.value && error.value.data) {
-  console.log('MYERROR', error.value.data)
-  errorMsg.value = ''
-  for (const prop in error.value.data.errors) {
-    errorMsg.value = `${errorMsg.value}<li>${error.value.data.errors[prop].message}</li>`
-  }
-  errorMsg.value = `<ul>${errorMsg.value}</ul>`
-}
-console.log(data.value)
+const jsonRes = await response.json()
+console.log(jsonRes)
+categories.value = jsonRes.docs
+count.value = jsonRes.results
+totalCount.value = jsonRes.totalCount
+
+// onMounted(async () => {
+// const { data: categories, pending, refresh, error } = useLazyFetch(`${config.apiUrl}/categories`)
+// if (error.value && error.value.data) {
+//   console.log('MYERROR', error.value.data)
+//   errorMsg.value = ''
+//   for (const prop in error.value.data.errors) {
+//     errorMsg.value = `${errorMsg.value}<li>${error.value.data.errors[prop].message}</li>`
+//   }
+//   errorMsg.value = `<ul>${errorMsg.value}</ul>`
+// } else {
+//   console.log(categories.value)
+//   // categories.value = data.value.docs
+//   // count.value = data.value.results
+//   // totalCount.value = data.value.totalCount
+//   // console.log('CAT', categories.value)
+// }
+// })
 
 // Fetch all
 // response = await fetchAll('categories', params.value)
 
-// categories.value = response.docs
 // count.value = response.count
-// totalCount.value = response.totalCount
 // console.log(categories.value)
 // const topLevel = categories.value.filter((c) => !c.parent)
 // for (const i in topLevel) {
@@ -112,6 +130,12 @@ const showAlert = (heading, paragraph, action, showCancelBtn) => {
   alert.value.show = true
 }
 
+watch(categories, (newCategories) => {
+  console.log('PPPP', newCategories)
+  // Because posts starts out null, you won't have access
+  // to its contents immediately, but you can watch it.
+})
+
 // watch(
 //   () => alert.value.show,
 //   (currentVal) => {
@@ -122,28 +146,37 @@ const showAlert = (heading, paragraph, action, showCancelBtn) => {
 </script>
 
 <template>
-  <div class="hfull flex-col items-center gap2 p3">
+  <div class="p-3">
     <Title>{{ title }}</Title>
-    <header class="flex-row items-center justify-between w-full max-width-130">
-      <h3 class="title">Categories</h3>
-      <!-- <NuxtLink class="link" :to="{ name: 'admin-ecommerce-categories-slug', params: { slug: ' ' } }">
-        <button class="btn btn__primary btn__pill px2 py05 text-xs"><IconsPlus class="w2 h2" /><span>Add</span></button>
-      </NuxtLink> -->
-    </header>
-    <main class="flex-1 max-width-130 w-full flex-col gap3">
-      <div class="flex-col gap3 flex-col br5">
-        <!-- <div class="border-b-slate-300 p2" v-if="totalCount"> -->
-        <!-- <Search @searchKeywordSelected="handleSearch" /> -->
-        <!-- </div> -->
-        <!-- <EcommerceAdminCategoriesList
-          :categories="categories"
-          :totalCount="totalCount"
-          @deleteCategory="showDeleteCategoryAlert"
-        /> -->
-      </div>
-    </main>
+    {{ pages }}---{{ count }}===={{ totalCount }}
+    <!-- <div v-if="!pending"> -->
+    <div class="flex-col items-center gap-2">
+      <header class="flex-row items-center justify-between w-full">
+        <h3 class="title">Categories</h3>
+        <NuxtLink :to="{ name: 'admin-ecommerce-categories-slug', params: { slug: 'new' } }">
+          <button class="btn btn__primary btn__pill px-2 py-05">
+            <IconsPlus />
+            <span>Add</span>
+          </button>
+        </NuxtLink>
+      </header>
+      <main class="flex-1 max-width-130 w-full flex-col gap3">
+        <div class="flex-col gap3 flex-col br5">
+          <div class="border-b-slate-300 p2" v-if="totalCount">
+            <Search @searchKeywordSelected="handleSearch" />
+          </div>
+          <EcommerceAdminCategoriesList
+            :categories="categories"
+            :totalCount="totalCount"
+            @deleteCategory="showDeleteCategoryAlert"
+          />
+        </div>
+      </main>
+    </div>
+    <!-- </div> -->
+    <!-- <div v-else>loading ...</div> -->
     <footer class="w-full max-width-130">
-      <!-- <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1" /> -->
+      <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1" />
     </footer>
   </div>
 </template>
