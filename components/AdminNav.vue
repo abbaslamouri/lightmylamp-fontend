@@ -9,7 +9,7 @@ const navLinks = ref([
     subMenu: [
       // { name: 'admin-ecommerce-products', title: 'Products', icon: 'IconsCartFill' },
       { name: 'admin-ecommerce-categories', title: 'Categories', icon: 'IconsClipboard' },
-      // { name: 'admin-ecommerce-attributes', title: 'Attributes', icon: 'IconsIdentification' },
+      { name: 'admin-ecommerce-attributes', title: 'Attributes', icon: 'IconsIdentification' },
     ],
     open: false,
   },

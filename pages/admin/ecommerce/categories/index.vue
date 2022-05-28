@@ -148,7 +148,7 @@ watch(categories, (newCategories) => {
 <template>
   <div class="p-3">
     <Title>{{ title }}</Title>
-    {{ pages }}---{{ count }}===={{ totalCount }}
+    <!-- {{ pages }}---{{ count }}===={{ totalCount }} -->
     <!-- <div v-if="!pending"> -->
     <div class="flex-col items-center gap-2">
       <header class="flex-row items-center justify-between w-full">
