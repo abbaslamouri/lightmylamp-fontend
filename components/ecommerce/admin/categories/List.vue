@@ -11,6 +11,8 @@ const emit = defineEmits(['deleteCategory'])
 const config = useRuntimeConfig()
 const router = useRouter()
 
+const showActionKeys = ref([])
+
 // const showActionKeys = ref([])
 const showActions = ref(true)
 const editAction = ref(false)
@@ -30,7 +32,7 @@ const handleEditProduct = (slug) => {
   router.push({ name: 'ecommerce-categories-slug', params: { slug } })
 }
 
-const handleDeleteCategory = (categoryId) => {
+const deleteCategory = (categoryId) => {
   resetActions()
   emit('deleteCategory', categoryId)
 }
@@ -51,69 +53,15 @@ const handleDeleteCategory = (categoryId) => {
           </tr>
         </thead>
         <tbody class="bg-white">
-          <tr class="border border-b-stone-300 py-05" v-for="(category, index) in categories" :key="category._id">
-            <td>{{ category.sortOrder }}</td>
-            <td class="flex-row justify-center">
-              <div class="w-5 h-5">
-                <img
-                  class="w-full h-full contain"
-                  v-if="
-                    category.gallery.length && category.gallery[0] && category.gallery[0].mimetype.includes('image')
-                  "
-                  :src="`${config.backendUrl}/${category.gallery[0].path}/${category.gallery[0].name}`"
-                />
-                <img v-else class="w-full h-full contain" :src="`/placeholder.png`" />
-              </div>
-            </td>
-            <td>
-              <div>{{ category.name }}</div>
-              <!-- <div class="flex-col items-center">
-								<div class="flex-row items-center" v-for="item in category.children">
-									{{ category.name }} -> {{ item.name }}
-									<div class="flex-row items-center" v-for="child in item.children">
-										-> {{ child.name }}
-										<div class="flex-row items-center" v-for="grandChild in child.children">
-											-> {{ grandChild.name }}
-										</div>
-									</div>
-								</div>
-							</div> -->
-            </td>
-            <td>{{ category.slug }}</td>
-            <td>
-              <span v-if="category.parent">
-                {{ category.parent.name }}
-              </span>
-              <span v-else>-</span>
-            </td>
-            <td class="minw-12">
-              <div class="admin-actions flex-row justify-end gap-05">
-                <div class="shadow-md p-1 border border-slate-300 flex-col gap-05" v-show="editAction">
-                  <a
-                    href="#"
-                    class="edit-action text-slate-800 font-bold"
-                    @click.prevent="editAction = true"
-                    v-if="showActions"
-                  >
-                    <div class="">Edit</div>
-                  </a>
-                  <a href="#" class="delete-action text-xs text-red-700" @click.prevent="$emit('deleteAction')">
-                    Delete
-                  </a>
-                </div>
-                <button class="btn btn__close p-05" @click.prevent="showActions = !showActions">
-                  <IconsMoreHoriz />
-                </button>
-              </div>
-              <!-- <EcommerceActions
-                :showAction="showActionKeys[index]"
-                :showEdit="true"
-                @moreHoriz="setActions({ index: index, action: !showActionKeys[index] })"
-                @deleteAction="handleDeleteCategory(category._id)"
-                @editAction="handleEditProduct(category.slug)"
-              /> -->
-            </td>
-          </tr>
+          <EcommerceAdminCategoriesCard
+            v-for="(category, index) in categories"
+            :key="category._id"
+            :category="category"
+            :index="index"
+            :showAction="showActionKeys[index]"
+            @setActions="setActions"
+            @deletecategory="deleteCategory"
+          />
         </tbody>
       </table>
     </div>
@@ -147,4 +95,11 @@ const handleDeleteCategory = (categoryId) => {
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import '@/assets/scss/variables';
+
+th {
+  border-bottom: 1px solid $stone-300;
+  padding: 1rem;
+}
+</style>

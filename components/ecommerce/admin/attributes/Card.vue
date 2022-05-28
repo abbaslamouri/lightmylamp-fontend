@@ -17,14 +17,16 @@ const emit = defineEmits(['setActions', 'attributeUpdated', 'deleteAttribute', '
 const config = useRuntimeConfig()
 const { message, errorMsg } = useAppState()
 const { saveDoc } = useHttp()
-const newTerm = ref(null)
+const newTerm = ref('')
 const termInputRef = ref(null)
+const attributeInputRef = ref(null)
 const newAttribute = reactive({
   ...props.attribute,
 })
 
 const addAttribute = async () => {
   const attribute = await saveDoc('attributes', newAttribute)
+  attributeInputRef.value.blur()
   if (Object.values(attribute).length) emit('attributeUpdated', attribute)
 }
 
@@ -42,10 +44,14 @@ const addAttributeTerm = async () => {
 
 <template>
   <tr class="admin-attribute row">
-    <td>{{ newAttribute.sortOrder }}</td>
+    <td class="max-w-6">
+      <div class="base-input">
+        <input type="text" required v-model="newAttribute.sortOrder" @keyup.enter="addAttribute" />
+      </div>
+    </td>
     <td class="max-w-10">
       <div class="base-input">
-        <input type="text" required v-model="newAttribute.name" @keyup.enter="addAttribute" />
+        <input type="text" ref="attributeInputRef" required v-model="newAttribute.name" @keyup.enter="addAttribute" />
       </div>
     </td>
     <td>
@@ -62,7 +68,6 @@ const addAttributeTerm = async () => {
         </div>
         <div class="form-group" @click="checkIfAttribute">
           <input
-            class="py-02 px-1"
             ref="termInputRef"
             type="text"
             v-model="newTerm"

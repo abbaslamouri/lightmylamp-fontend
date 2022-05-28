@@ -26,7 +26,7 @@ const useHttp = () => {
       const response = await fetch(`${config.apiUrl}/${resource}?${query}`, {
         method: 'GET',
       })
-      console.log(response)
+      // console.log(response)
       if (response.ok) return await response.json()
       if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
       throw getErrorStr((await response.json()).errors)
@@ -123,7 +123,7 @@ const useHttp = () => {
         },
       })
 
-      console.log(response)
+      // console.log(response)
       if (response.ok) return await response.json()
       if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
       throw getErrorStr((await response.json()).errors)
@@ -134,7 +134,34 @@ const useHttp = () => {
     }
   }
 
-  return { fetchAll, fetchDoc, saveDoc, deleteDocs }
+  const deleteDoc = async (resource, id) => {
+    errorMsg.value = null
+    message.value = null
+    let response = null
+    const token =
+      useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+        ? useCookie('auth').value.token
+        : null
+    try {
+      response = await fetch(`${config.apiUrl}/${resource}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      // console.log(response)
+      if (response.ok) return true
+      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+      throw getErrorStr((await response.json()).errors)
+    } catch (err) {
+      console.log('MYERROR', err)
+      errorMsg.value = err
+      return {}
+    }
+  }
+
+  return { fetchAll, fetchDoc, saveDoc, deleteDoc, deleteDocs }
 }
 
 export default useHttp

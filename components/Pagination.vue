@@ -28,13 +28,10 @@ const setCurrentPage = async (p, action) => {
   }
 }
 
-// watch(currentPage, (current) => {
-//   emit('pageSet', props.page)
-// })
 </script>
 
 <template>
-  <nav class="pagination">
+  <nav class="pagination flex-row justify-center gap-05">
     <span class="page" @click="setCurrentPage(0, 'prev')" :class="{ disabled: page === 1 }">
       <IconsChevronLeft />
     </span>
@@ -55,33 +52,28 @@ const setCurrentPage = async (p, action) => {
 </template>
 
 <style lang="scss" scoped>
-.pagination {
+@import '@/assets/scss/variables';
+
+.page {
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  border: 1px solid $slate-400;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 2px;
+  cursor: pointer;
 
-  .page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #b0bec5;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 2px;
-    background-color: #eceff1;
-    cursor: pointer;
-
-    &.disabled {
-      cursor: not-allowed;
-      svg {
-        fill: #ccc;
-      }
+  &.disabled {
+    cursor: not-allowed;
+    svg {
+      fill: #ccc;
     }
+  }
 
-    &.active {
-      background-color: #546e7a;
-      color: #fff;
-    }
+  &.active {
+    background-color: $slate-400;
+    color: $slate-50;
   }
 }
 </style>

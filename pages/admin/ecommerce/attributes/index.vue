@@ -2,31 +2,29 @@
 definePageMeta({
   layout: 'admin',
 })
-
 const title = ref('Attributes | YRL')
 
 const config = useRuntimeConfig()
-const { errorMsg, message, alert } = useAppState()
-const { fetchAll, deleteDocs } = useHttp()
-const showActionKeys = ref([])
+const { errorMsg, message } = useAppState()
+const { fetchAll, deleteDoc, deleteDocs } = useHttp()
+
 const attributes = ref([])
-const termToDeleteId = ref('')
-const attributeToDeleteId = ref('')
 const totalCount = ref(0) // Total item count in the database
 const count = ref(0)
-const keyword = ref('')
+const showActionKeys = ref([])
 const page = ref(1)
-const perPage = ref(20)
+const perPage = ref(4)
+const fields = '-updatedAt'
+const keyword = ref('')
 const sort = reactive({
   field: 'sortOrder',
   order: '',
 })
-let response = null
 
-const fields = '-updatedAt'
+let response = null
 const sortOptions = [
   { key: 'sortOrder', name: 'Order' },
-  { key: 'name', name: 'name' },
+  { key: 'name', name: 'Name' },
   { key: 'createAt', name: 'Date Created' },
 ]
 
@@ -35,7 +33,7 @@ const params = computed(() => {
     fields,
     page: page.value,
     limit: perPage.value,
-    sort: `${sort.order}${sort.field}`,
+    sort: `${sort.order}${sort.field}, _id `,
     keyword: keyword.value ? keyword.value : null,
   }
   if (!keyword.value) delete params.keyword
@@ -48,28 +46,12 @@ const pages = computed(() =>
     : parseInt(totalCount.value / perPage.value)
 )
 
-// const esc = encodeURIComponent
-// const query = Object.keys(params.value)
-//   .map((k) => esc(k) + '=' + esc(params.value[k]))
-//   .join('&')
-
-// console.log('ESC', esc)
-// console.log('QUERY', query)
-
-// response = await fetch(`${config.apiUrl}/attributes?${query}`, {
-//   method: 'GET',
-// })
-// const jsonRes = await response.json()
-// console.log(jsonRes)
-// attributes.value = jsonRes.docs
-// count.value = jsonRes.results
-// totalCount.value = jsonRes.totalCount
-
 const fetchAllAttributes = async () => {
   response = await fetchAll('attributes', params.value)
   attributes.value = response.docs
   count.value = response.results
   totalCount.value = response.totalCount
+  console.log(response)
 }
 
 const resetActions = () => {
@@ -103,88 +85,25 @@ const setPage = async (currentPage) => {
 
 const addNewAttribute = () => {
   attributes.value.push({ name: '', sortOrder: 0, terms: [] })
-  // totalCount.value++
 }
 
-// const showDeleteAttributeAlert = (attributeId) => {
-//   attributeToDeleteId.value = attributeId
-//   console.log(attributeToDeleteId.value)
-//   showAlert(
-//     'Are you sure you want to delete this attribute?',
-//     'You must also delete all product variants containing this attribute if any',
-//     'deleteAttribute',
-//     true
-//   )
-// }
-
 const deleteAttribute = async (attributeId) => {
-  console.log(attributeId)
   if (
     !confirm(
       'Are you sure you want to delete this attribute? You must also delete all the product variants associated with this term'
     )
   )
     return
-  // errorMsg.value = ''
-  // message.value = ''
-  // let jsonRes
-  response = await fetch(`${config.apiUrl}/attributes/${attributeId}`, {
-    method: 'DELETE',
-  })
-  // jsonRes = await response.json()
-  // console.log(jsonRes)
-  // console.log(response)
-
-  response = await deleteDocs('attributeterms', { parent: attributeId })
-  console.log('DAT', response)
-  if (response.deletedCount || response.deletedCount == 0) {
-    fetchAllAttributes()
-    message.value = 'Attributes and attribute terms deleted succesfully'
+  if (await deleteDoc('attributes', attributeId)) {
+    response = await deleteDocs('attributeterms', { parent: attributeId })
+    console.log('DAT', response)
+    if (response.deletedCount || response.deletedCount == 0) {
+      fetchAllAttributes()
+      message.value = 'Attributes and attribute terms deleted succesfully'
+    }
   }
-
-  // console.log('LLLLLLLL')
-  // response = await fetch(`${config.apiUrl}/attributeterms/delete-many`, {
-  //   method: 'POST',
-  //   body: JSON.stringify({ parent: attributeId }),
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  // })
-  // jsonRes = await response.json()
-  // console.log(jsonRes) // await $fetchAll('attributes', {}, 'DELETE', attributeToDeleteId.value)
   resetActions()
-
-  // const {
-  //   data: attributeData,
-  //   pending: attributePending,
-  //   error: attributeError,
-  // } = await useFetch(`${config.API_URL}/attributes/${attributeToDeleteId.value}`, {
-  //   method: 'DELETE',
-  // })
-  // if (attributeError.value) throw attributeError.value
-  // const {
-  //   data: attributeTermsData,
-  //   pending: attributeTermsPending,
-  //   error: attributeTermsError,
-  // } = await useFetch(`${config.API_URL}/attributeterms/deleteMany`, {
-  //   method: 'DELETE',
-  //   body: { parent: attributeToDeleteId.value },
-  // })
-  // if (attributeTermsError.value) throw attributeTermsError.value
-
-  // alert.value.action = ''
-  // alert.value.show = false
 }
-
-// const showDeleteTermAlert = (termId) => {
-//   termToDeleteId.value = termId
-//   showAlert(
-//     'Are you sure you want to delete this attribute term?',
-//     'You must also delete all variants containig this term',
-//     'deleteTerm',
-//     true
-//   )
-// }
 
 const deleteTerm = async (termId) => {
   if (
@@ -199,41 +118,12 @@ const deleteTerm = async (termId) => {
     response = await fetch(`${config.apiUrl}/attributeterms/${termId}`, {
       method: 'DELETE',
     })
-    // const jsonRes = await response.json()
-    // console.log(jsonRes)
-    // attributes.value = jsonRes.docs
-    // count.value = jsonRes.results
-    // totalCount.value = jsonRes.totalCount
-    // const { data, pending, error } = await useFetch(`${config.API_URL}/attributeterms/${termToDeleteId.value}`, {
-    //   method: 'DELETE',
-    // })
-    // if (error.value) throw error.value
   } catch (err) {
     console.log(err)
     errorMsg.value = err.message ? err.message : err.data && err.data.message ? err.data.message : ''
   }
-  // termToDeleteId.value = ''
-  // alert.value.action = ''
-  // alert.value.show = false
   fetchAllAttributes()
 }
-
-// const showAlert = (heading, paragraph, action, showCancelBtn) => {
-//   alert.value.heading = heading
-//   alert.value.paragraph = paragraph
-//   alert.value.action = action
-//   alert.value.showCancelBtn = showCancelBtn
-//   alert.value.show = true
-// }
-
-// watch(
-//   () => alert.value.show,
-//   (currentVal) => {
-//     if (currentVal === 'ok' && alert.value.action === 'deleteAttribute') deleteAttribute()
-
-//     if (currentVal === 'ok' && alert.value.action === 'deleteTerm') deleteTerm()
-//   }
-// )
 
 await fetchAllAttributes()
 </script>
@@ -243,13 +133,14 @@ await fetchAllAttributes()
     <Title>{{ title }}</Title>
     <div class="flex-row items-center justify-between w-full max-w-130">
       <h3>Attributes</h3>
+      {{ page }}
       <button class="btn btn__primary btn__pill px-2 py-05 flex-row" @click="addNewAttribute">
         <IconsPlus class="w-2 h-2" />
         Add New
       </button>
     </div>
     <div class="flex-1 max-w-130 w-full flex-col gap-3">
-      <div class="flex-col gap-2 br-5" v-if="attributes.length">
+      <div class="flex-col gap-2 br-5" v-if="totalCount">
         <div class="flex-row items-center gap-3">
           <Search class="flex-1" @searchKeywordSelected="handleSearch" />
           <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="toggleSort" />
@@ -263,7 +154,7 @@ await fetchAllAttributes()
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody v-if="attributes.length">
+          <tbody>
             <EcommerceAdminAttributesCard
               v-for="(attribute, index) in attributes"
               :key="attribute._id"
@@ -277,6 +168,7 @@ await fetchAllAttributes()
             />
           </tbody>
         </table>
+        <div class="text-center p-2 text-lg" v-if="!attributes.length">No results found</div>
       </div>
       <EcommerceAdminAttributesEmptyMsg v-else />
     </div>
