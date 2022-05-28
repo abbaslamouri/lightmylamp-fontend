@@ -1,7 +1,4 @@
 <script setup>
-// useMeta({
-//   title: 'Attributes | YRL',
-// })
 definePageMeta({
   layout: 'admin',
 })
@@ -10,7 +7,7 @@ const title = ref('Attributes | YRL')
 
 const config = useRuntimeConfig()
 const { errorMsg, message, alert } = useAppState()
-// const { $fetchAll } = useNuxtApp()
+const { fetchAll, deleteDocs } = useHttp()
 const showActionKeys = ref([])
 const attributes = ref([])
 const termToDeleteId = ref('')
@@ -19,7 +16,7 @@ const totalCount = ref(0) // Total item count in the database
 const count = ref(0)
 const keyword = ref('')
 const page = ref(1)
-const perPage = ref(3)
+const perPage = ref(20)
 const sort = reactive({
   field: 'sortOrder',
   order: '',
@@ -68,27 +65,11 @@ const pages = computed(() =>
 // count.value = jsonRes.results
 // totalCount.value = jsonRes.totalCount
 
-const fetchAll = async () => {
-  // const response = await $fetchAll('attributes', params.value)
-  // attributes.value = response.docs
-  // totalCount.value = response.totalCount
-  // console.log(attributes.value)
-  const esc = encodeURIComponent
-  const query = Object.keys(params.value)
-    .map((k) => esc(k) + '=' + esc(params.value[k]))
-    .join('&')
-
-  console.log('ESC', esc)
-  console.log('QUERY', query)
-
-  response = await fetch(`${config.apiUrl}/attributes?${query}`, {
-    method: 'GET',
-  })
-  const jsonRes = await response.json()
-  console.log(jsonRes)
-  attributes.value = jsonRes.docs
-  count.value = jsonRes.results
-  totalCount.value = jsonRes.totalCount
+const fetchAllAttributes = async () => {
+  response = await fetchAll('attributes', params.value)
+  attributes.value = response.docs
+  count.value = response.results
+  totalCount.value = response.totalCount
 }
 
 const resetActions = () => {
@@ -105,19 +86,19 @@ const setActions = (payload) => {
 const handleSearch = async (searchKeyword) => {
   keyword.value = searchKeyword
   page.value = 1
-  await fetchAll()
+  await fetchAllAttributes()
 }
 
 const toggleSort = async (event) => {
   sort.field = event.field
   sort.order = event.order
-  await fetchAll()
+  await fetchAllAttributes()
 }
 
 // Set current page
 const setPage = async (currentPage) => {
   page.value = currentPage
-  await fetchAll()
+  await fetchAllAttributes()
 }
 
 const addNewAttribute = () => {
@@ -125,96 +106,136 @@ const addNewAttribute = () => {
   // totalCount.value++
 }
 
-const showDeleteAttributeAlert = (attributeId) => {
-  attributeToDeleteId.value = attributeId
-  console.log(attributeToDeleteId.value)
-  showAlert(
-    'Are you sure you want to delete this attribute?',
-    'You must also delete all product variants containing this attribute if any',
-    'deleteAttribute',
-    true
-  )
-}
+// const showDeleteAttributeAlert = (attributeId) => {
+//   attributeToDeleteId.value = attributeId
+//   console.log(attributeToDeleteId.value)
+//   showAlert(
+//     'Are you sure you want to delete this attribute?',
+//     'You must also delete all product variants containing this attribute if any',
+//     'deleteAttribute',
+//     true
+//   )
+// }
 
-const deleteAttribute = async () => {
+const deleteAttribute = async (attributeId) => {
+  console.log(attributeId)
+  if (
+    !confirm(
+      'Are you sure you want to delete this attribute? You must also delete all the product variants associated with this term'
+    )
+  )
+    return
   // errorMsg.value = ''
   // message.value = ''
-  try {
-    console.log('LLLLLLLL')
-    await $fetchAll('attributes', {}, 'DELETE', attributeToDeleteId.value)
+  // let jsonRes
+  response = await fetch(`${config.apiUrl}/attributes/${attributeId}`, {
+    method: 'DELETE',
+  })
+  // jsonRes = await response.json()
+  // console.log(jsonRes)
+  // console.log(response)
 
-    // const {
-    //   data: attributeData,
-    //   pending: attributePending,
-    //   error: attributeError,
-    // } = await useFetch(`${config.API_URL}/attributes/${attributeToDeleteId.value}`, {
-    //   method: 'DELETE',
-    // })
-    // if (attributeError.value) throw attributeError.value
-    const {
-      data: attributeTermsData,
-      pending: attributeTermsPending,
-      error: attributeTermsError,
-    } = await useFetch(`${config.API_URL}/attributeterms/deleteMany`, {
-      method: 'DELETE',
-      body: { parent: attributeToDeleteId.value },
-    })
-    if (attributeTermsError.value) throw attributeTermsError.value
-  } catch (err) {
-    console.log(err)
-    errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
+  response = await deleteDocs('attributeterms', { parent: attributeId })
+  console.log('DAT', response)
+  if (response.deletedCount || response.deletedCount == 0) {
+    fetchAllAttributes()
+    message.value = 'Attributes and attribute terms deleted succesfully'
   }
-  alert.value.action = ''
-  alert.value.show = false
-  fetchAll()
+
+  // console.log('LLLLLLLL')
+  // response = await fetch(`${config.apiUrl}/attributeterms/delete-many`, {
+  //   method: 'POST',
+  //   body: JSON.stringify({ parent: attributeId }),
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  // })
+  // jsonRes = await response.json()
+  // console.log(jsonRes) // await $fetchAll('attributes', {}, 'DELETE', attributeToDeleteId.value)
+  resetActions()
+
+  // const {
+  //   data: attributeData,
+  //   pending: attributePending,
+  //   error: attributeError,
+  // } = await useFetch(`${config.API_URL}/attributes/${attributeToDeleteId.value}`, {
+  //   method: 'DELETE',
+  // })
+  // if (attributeError.value) throw attributeError.value
+  // const {
+  //   data: attributeTermsData,
+  //   pending: attributeTermsPending,
+  //   error: attributeTermsError,
+  // } = await useFetch(`${config.API_URL}/attributeterms/deleteMany`, {
+  //   method: 'DELETE',
+  //   body: { parent: attributeToDeleteId.value },
+  // })
+  // if (attributeTermsError.value) throw attributeTermsError.value
+
+  // alert.value.action = ''
+  // alert.value.show = false
 }
 
-const showDeleteTermAlert = (termId) => {
-  termToDeleteId.value = termId
-  showAlert(
-    'Are you sure you want to delete this attribute term?',
-    'You must also delete all variants containig this term',
-    'deleteTerm',
-    true
+// const showDeleteTermAlert = (termId) => {
+//   termToDeleteId.value = termId
+//   showAlert(
+//     'Are you sure you want to delete this attribute term?',
+//     'You must also delete all variants containig this term',
+//     'deleteTerm',
+//     true
+//   )
+// }
+
+const deleteTerm = async (termId) => {
+  if (
+    !confirm(
+      'Are you sure you want to delete this term? You must also delete all the product variants associated with this term'
+    )
   )
-}
-
-const deleteTerm = async () => {
+    return
   errorMsg.value = ''
   message.value = ''
   try {
-    const { data, pending, error } = await useFetch(`${config.API_URL}/attributeterms/${termToDeleteId.value}`, {
+    response = await fetch(`${config.apiUrl}/attributeterms/${termId}`, {
       method: 'DELETE',
     })
-    if (error.value) throw error.value
+    // const jsonRes = await response.json()
+    // console.log(jsonRes)
+    // attributes.value = jsonRes.docs
+    // count.value = jsonRes.results
+    // totalCount.value = jsonRes.totalCount
+    // const { data, pending, error } = await useFetch(`${config.API_URL}/attributeterms/${termToDeleteId.value}`, {
+    //   method: 'DELETE',
+    // })
+    // if (error.value) throw error.value
   } catch (err) {
     console.log(err)
     errorMsg.value = err.message ? err.message : err.data && err.data.message ? err.data.message : ''
   }
-  termToDeleteId.value = ''
-  alert.value.action = ''
-  alert.value.show = false
-  fetchAll()
+  // termToDeleteId.value = ''
+  // alert.value.action = ''
+  // alert.value.show = false
+  fetchAllAttributes()
 }
 
-const showAlert = (heading, paragraph, action, showCancelBtn) => {
-  alert.value.heading = heading
-  alert.value.paragraph = paragraph
-  alert.value.action = action
-  alert.value.showCancelBtn = showCancelBtn
-  alert.value.show = true
-}
+// const showAlert = (heading, paragraph, action, showCancelBtn) => {
+//   alert.value.heading = heading
+//   alert.value.paragraph = paragraph
+//   alert.value.action = action
+//   alert.value.showCancelBtn = showCancelBtn
+//   alert.value.show = true
+// }
 
-watch(
-  () => alert.value.show,
-  (currentVal) => {
-    if (currentVal === 'ok' && alert.value.action === 'deleteAttribute') deleteAttribute()
+// watch(
+//   () => alert.value.show,
+//   (currentVal) => {
+//     if (currentVal === 'ok' && alert.value.action === 'deleteAttribute') deleteAttribute()
 
-    if (currentVal === 'ok' && alert.value.action === 'deleteTerm') deleteTerm()
-  }
-)
+//     if (currentVal === 'ok' && alert.value.action === 'deleteTerm') deleteTerm()
+//   }
+// )
 
-await fetchAll()
+await fetchAllAttributes()
 </script>
 
 <template>
@@ -228,11 +249,10 @@ await fetchAll()
       </button>
     </div>
     <div class="flex-1 max-w-130 w-full flex-col gap-3">
-      {{ attributes }}
       <div class="flex-col gap-2 br-5" v-if="attributes.length">
         <div class="flex-row items-center gap-3">
-          <!-- <Search class="flex-1" @searchKeywordSelected="handleSearch" /> -->
-          <!-- <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="toggleSort" /> -->
+          <Search class="flex-1" @searchKeywordSelected="handleSearch" />
+          <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="toggleSort" />
         </div>
         <table class="shadow-md border border-slate-300">
           <thead class="bg-slate-300">
@@ -251,9 +271,9 @@ await fetchAll()
               :index="index"
               :showAction="showActionKeys[index]"
               @setActions="setActions"
-              @attributeUpdated="fetchAll"
-              @deleteAttribute="showDeleteAttributeAlert"
-              @deleteTerm="showDeleteTermAlert"
+              @attributeUpdated="fetchAllAttributes"
+              @deleteAttribute="deleteAttribute"
+              @deleteTerm="deleteTerm"
             />
           </tbody>
         </table>
@@ -266,4 +286,11 @@ await fetchAll()
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import '@/assets/scss/variables';
+
+th {
+  border-bottom: 1px solid $stone-300;
+  padding: 1rem;
+}
+</style>

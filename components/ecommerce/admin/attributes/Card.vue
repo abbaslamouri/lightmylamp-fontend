@@ -1,6 +1,4 @@
 <script setup>
-// import slugify from 'slugify'
-
 const props = defineProps({
   attribute: {
     type: Object,
@@ -14,74 +12,30 @@ const props = defineProps({
     type: Boolean,
   },
 })
-
 const emit = defineEmits(['setActions', 'attributeUpdated', 'deleteAttribute', 'deleteTerm'])
+
 const config = useRuntimeConfig()
-const { message, errorMsg, alert } = useAppState()
+const { message, errorMsg } = useAppState()
+const { saveDoc } = useHttp()
 const newTerm = ref(null)
 const termInputRef = ref(null)
-const showActions = ref(true)
-const editAction = ref(false)
 const newAttribute = reactive({
   ...props.attribute,
 })
 
 const addAttribute = async () => {
-  console.log('AT', { ...newAttribute })
-  errorMsg.value = ''
-  message.value = ''
-  try {
-    const response = await fetch(`${config.apiUrl}/attributes`, {
-      method: 'POST',
-      body: JSON.stringify(newAttribute),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const jsonRes = await response.json()
-    console.log(jsonRes)
-
-    // const { data, pending, error } = await useFetch(`${config.API_URL}/attributes`, {
-    //   method: 'POST',
-    //   body: newAttribute,
-    // })
-    // if (error.value) throw error.value
-    emit('attributeUpdated', jsonRes.doc)
-  } catch (err) {
-    console.log('ERRRRR', err)
-    errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
-  }
+  const attribute = await saveDoc('attributes', newAttribute)
+  if (Object.values(attribute).length) emit('attributeUpdated', attribute)
 }
 
 const addAttributeTerm = async () => {
-  errorMsg.value = ''
-  message.value = ''
-  try {
-    if (!props.attribute._id) return (errorMsg.value = 'Attribute is required')
-    // const termSlug = slugify(newTerm.value, { lower: true })
-    if (props.attribute.attributeterms.find((t) => t.name === newTerm.value))
-      return (errorMsg.value = 'Terms must be unique for each attribute')
-    const response = await fetch(`${config.apiUrl}/attributeterms`, {
-      method: 'POST',
-      body: JSON.stringify({ name: newTerm.value, parent: props.attribute._id }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const jsonRes = await response.json()
-    console.log(jsonRes)
-    // const { data, pending, error } = await useFetch(`${config.API_URL}/attributeterms`, {
-    //   method: 'POST',
-    //   body: { name: newTerm.value, slug: termSlug, parent: props.attribute._id },
-    // })
-    // console.log('DATA', data.value)
-    // if (error.value) throw error.value
+  if (!props.attribute._id) return (errorMsg.value = 'Attribute is required')
+  if (props.attribute.attributeterms.find((t) => t.name === newTerm.value))
+    return (errorMsg.value = 'Terms must be unique for each attribute')
+  const attributeTerm = await saveDoc('attributeterms', { name: newTerm.value, parent: props.attribute._id })
+  if (Object.values(attributeTerm).length) {
     newTerm.value = ''
     emit('attributeUpdated')
-    console.log(jsonRes.doc)
-  } catch (err) {
-    console.log('ERRRRRRRR', err)
-    errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
   }
 }
 </script>
@@ -121,28 +75,12 @@ const addAttributeTerm = async () => {
       </div>
     </td>
     <td class="minw-12">
-      <div class="admin-actions flex-row justify-end gap-05">
-        <div class="shadow-md p-1 border border-slate-300 flex-col gap-05" v-show="editAction">
-          <a
-            href="#"
-            class="edit-action text-slate-800 font-bold"
-            @click.prevent="editAction = true"
-            v-if="showActions"
-          >
-            <div class="">Edit</div>
-          </a>
-          <a href="#" class="delete-action text-xs text-red-700" @click.prevent="$emit('deleteAction')"> Delete </a>
-        </div>
-        <button class="btn btn__close p-05" @click.prevent="showActions = !showActions">
-          <IconsMoreHoriz />
-        </button>
-      </div>
-      <!-- <EcommerceActions
+      <EcommerceAdminRowActions
         :showAction="showAction"
         @moreHoriz="$emit('setActions', { index: index, action: !showAction })"
         @deleteAction="$emit('deleteAttribute', attribute._id)"
         @cancel="$emit('setActions', { index: index, action: false })"
-      /> -->
+      />
     </td>
   </tr>
 </template>
