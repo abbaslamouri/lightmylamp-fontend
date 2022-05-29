@@ -1,6 +1,8 @@
 <script setup>
-const { isAuthenticated } = useAuth()
+const { isAuthenticated, user } = useAuth()
 const showAdminSidebar = ref(true)
+console.log(useCookie('jwt').value)
+console.log('XXXXXX', isAuthenticated.value)
 
 const checkScreen = () => {
   if (process.client) {

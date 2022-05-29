@@ -2,16 +2,19 @@ const useAuth = () => {
   const { errorMsg, message } = useAppState()
   const config = useRuntimeConfig()
 
-  const user = useState('user', () =>
-    useCookie('auth').value && useCookie('auth').value.user ? useCookie('auth').value.user : {}
-  )
+  const user = useState('user', () => (useCookie('user') && useCookie('user').value ? useCookie('user').value : {}))
+
   const token = useState('token', () =>
-    useCookie('auth').value && useCookie('auth').value.token ? useCookie('auth').value.token : null
+    useCookie('token') && useCookie('token').value ? useCookie('token').value : ''
   )
 
-  const isAuthenticated = useState('isAuthenticated', () => (token && token.value ? true : false))
+  const isAuthenticated = useState('isAuthenticated', () =>
+    useCookie('token') && useCookie('token').value ? true : false
+  )
 
-  const isAdmin = useState('isAdmin', () => (user.value && user.value.role === 'admin' ? true : false))
+  const isAdmin = useState('isAdmin', () =>
+    useCookie('user').value && useCookie('user').value.role === 'admin' ? true : false
+  )
 
   const signup = async (user) => {
     errorMsg.value = ''
@@ -30,6 +33,25 @@ const useAuth = () => {
       }
       errorMsg.value = `<ul>${errorMsg.value}</ul>`
       return false
+    }
+  }
+
+  const signin = async (user) => {
+    errorMsg.value = null
+    message.value = null
+    try {
+      const response = await fetch(`${config.apiUrl}/auth/signin`, {
+        method: 'POST',
+        body: user,
+      })
+      console.log(response)
+      if (response.ok) return await response.json()
+      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+      throw getErrorStr((await response.json()).errors)
+    } catch (err) {
+      console.log('MYERROR', err)
+      errorMsg.value = err
+      return {}
     }
   }
 
@@ -54,26 +76,24 @@ const useAuth = () => {
     }
   }
 
-  const signin = async (user) => {
-    errorMsg.value = ''
-    message.value = ''
-    try {
-      const { data, pending, error } = await useFetch(`${config.API_URL}/auth/signin`, {
-        method: 'POST',
-        body: user,
-      })
-      if (error.value) throw error.value
-      if (data.value && data.value.status === 'fail') {
-        if (process.client) errorMsg.value = data.value.message
-        return false
-      }
-      return data.value
-    } catch (err) {
-      console.log('MYERROR', err)
-      errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
-      return false
-    }
-  }
+  // const signin = async (user) => {
+  //   try {
+  //     const { data, pending, error } = await useFetch(`${config.API_URL}/auth/signin`, {
+  //       method: 'POST',
+  //       body: user,
+  //     })
+  //     if (error.value) throw error.value
+  //     if (data.value && data.value.status === 'fail') {
+  //       if (process.client) errorMsg.value = data.value.message
+  //       return false
+  //     }
+  //     return data.value
+  //   } catch (err) {
+  //     console.log('MYERROR', err)
+  //     errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
+  //     return false
+  //   }
+  // }
 
   const fetchLoggedInUser = async () => {
     errorMsg.value = null

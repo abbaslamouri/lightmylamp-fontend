@@ -2,7 +2,7 @@
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
-const { user, token, isAuthenticated, login } = useAuth()
+const { user, token, jwt, isAuthenticated, login } = useAuth()
 const { errorMsg, message } = useAppState()
 const showAuthDropdown = ref(false)
 const formUser = reactive({
@@ -36,13 +36,14 @@ const signin = async () => {
     errorMsg.value = `<ul>${errorMsg.value}</ul>`
   }
   console.log(data.value)
-
-  // const response = await login(formUser)
-  // if (response.ok === false) return (errorMsg.value = response.errorMsg)
-  // message.value = 'Login successful'
-  // user.value = response.user
-  // token.value = response.token
-  // isAuthenticated.value = true
+  const tokenCookie = useCookie('token')
+  const userCookie = useCookie('user')
+  if (!tokenCookie.value) tokenCookie.value = data.value.auth.token
+  if (!userCookie.value) userCookie.value = { name: data.value.auth.user.name }
+  message.value = 'Login successful'
+  user.value = userCookie.value
+  token.value = tokenCookie.value
+  isAuthenticated.value = true
 }
 
 const forgotPassword = async () => {
