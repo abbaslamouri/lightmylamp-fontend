@@ -53,11 +53,11 @@ const config = useRuntimeConfig()
   </tr>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '@/assets/scss/variables';
 
 td {
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
 }
 </style>

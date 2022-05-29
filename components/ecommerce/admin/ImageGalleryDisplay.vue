@@ -98,7 +98,7 @@ const setFeaturedImage = (event) => {
 <template>
   <section class="flex-col gap-2">
     <div class="image-name br-3 h-2 flex-row items-center">
-      <span class="px-3 text-xs" v-if="hoveredImage">{{ hoveredImage.name }}</span>
+      <span class="px-3 text-xs" v-if="hoveredImage">{{ hoveredImage.originalName }}</span>
     </div>
     <div class="gallery" v-if="gallery.length">
       <div

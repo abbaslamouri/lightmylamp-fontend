@@ -35,34 +35,30 @@ const deleteCategory = (categoryId) => {
 </script>
 
 <template>
-  <div>
-    <div>
-      <table class="text-xs shadow-md">
-        <thead>
-          <tr class="bg-slate-200">
-            <th>Order</th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Slug</th>
-            <th>Parent</th>
-            <th class="text-right min-w-12">actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white">
-          <EcommerceAdminCategoriesCard
-            v-for="(category, index) in categories"
-            :key="category._id"
-            :category="category"
-            :index="index"
-            :showAction="showActionKeys[index]"
-            @setActions="setActions"
-            @deleteCategory="deleteCategory"
-            @editCategory="router.push({ name: 'admin-ecommerce-categories-slug', params: { slug: $event } })"
-          />
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <table class="text-xs shadow-md">
+    <thead>
+      <tr class="bg-slate-200">
+        <th>Order</th>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>Parent</th>
+        <th class="text-right min-w-12">actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white">
+      <EcommerceAdminCategoriesCard
+        v-for="(category, index) in categories"
+        :key="category._id"
+        :category="category"
+        :index="index"
+        :showAction="showActionKeys[index]"
+        @setActions="setActions"
+        @deleteCategory="deleteCategory"
+        @editCategory="router.push({ name: 'admin-ecommerce-categories-slug', params: { slug: $event } })"
+      />
+    </tbody>
+  </table>
 </template>
 
 <style lang="scss" scoped>

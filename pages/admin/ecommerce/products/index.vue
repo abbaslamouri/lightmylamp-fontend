@@ -2,13 +2,13 @@
 definePageMeta({
   layout: 'admin',
 })
-const title = ref('Categories | YRL')
+const title = ref('Products | YRL')
 
 const config = useRuntimeConfig()
 const { errorMsg, message } = useAppState()
 const { fetchAll, deleteDoc, deleteDocs } = useHttp()
 
-const categories = ref([])
+const products = ref([])
 const totalCount = ref(null) // Total item count in the database
 const count = ref(null) // item count taking into account params
 const showActionKeys = ref([])
@@ -46,9 +46,10 @@ const pages = computed(() => {
     : parseInt(totalCount.value / perPage.value)
 })
 
-const fetchAllCategories = async () => {
-  response = await fetchAll('categories', params.value)
-  categories.value = response.docs
+const fetchAllProducts = async () => {
+  response = await fetchAll('products', params.value)
+  console.log(response)
+  products.value = response.docs
   count.value = response.results
   totalCount.value = response.totalCount
 }
@@ -56,28 +57,34 @@ const fetchAllCategories = async () => {
 const handleSearch = async (searchKeyword) => {
   keyword.value = searchKeyword
   page.value = 1
-  await fetchAllCategories()
+  await fetchAllProducts()
 }
 
 const toggleSort = async (event) => {
   sort.field = event.field
   sort.order = event.order
-  await fetchAllCategories()
+  await fetchAllProducts()
 }
 
 const setPage = async (currentPage) => {
   page.value = currentPage
-  await fetchAllCategories()
+  await fetchAllProducts()
 }
 
-const deleteCategory = async (categoryId) => {
-  if (!confirm('Are you sure you want to delete this category?')) return
-  await deleteDoc('categories', categoryId)
-  fetchAllCategories()
-  message.value = 'Attributes and attribute terms deleted succesfully'
+const deleteProduct = async (productId) => {
+  if (
+    !confirm(
+      'Are you sure you want to delete this products?  This product and all associated variants will also be deleted'
+    )
+  )
+    return
+  if (!(await deleteDoc('products', productId))) return
+  console.log(response)
+  fetchAllProducts()
+  message.value = 'Product and product variants deleted succesfully'
 }
 
-await fetchAllCategories()
+await fetchAllProducts()
 </script>
 
 <template>
@@ -85,8 +92,8 @@ await fetchAllCategories()
     <Title>{{ title }}</Title>
     <div class="flex-1 flex-col justify-between gap-3" v-if="totalCount">
       <header class="flex-row items-center justify-between w-full">
-        <h3 class="title">Categories</h3>
-        <NuxtLink :to="{ name: 'admin-ecommerce-categories-slug', params: { slug: '_' } }">
+        <h3 class="title">Products</h3>
+        <NuxtLink :to="{ name: 'admin-ecommerce-products-slug', params: { slug: '_' } }">
           <button class="btn btn__primary btn__pill px-2 py-05">
             <IconsPlus />
             <span>Add</span>
@@ -99,11 +106,7 @@ await fetchAllCategories()
             <Search class="flex-1" @searchKeywordSelected="handleSearch" />
             <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="toggleSort" />
           </div>
-          <EcommerceAdminCategoriesList
-            :categories="categories"
-            :totalCount="totalCount"
-            @deleteCategory="deleteCategory"
-          />
+          <EcommerceAdminProductsList :products="products" :totalCount="totalCount" @deleteProduct="deleteProduct" />
         </div>
       </main>
       <footer class="w-full max-width-130">
@@ -111,12 +114,12 @@ await fetchAllCategories()
       </footer>
     </div>
     <EcommerceAdminEmptyMsg v-else>
-      <template #header>Add categories and subcategories</template>
+      <template #header>Add your first physical or digital product</template>
       <template #default>
-        <div class="">Create nested product categories with category images and descriptions</div>
+        <div class="">Add your product and variants. Products must have at least a name and a price</div>
         <NuxtLink
           class="btn btn__primary btn__pill px-3 py-05 text-xs items-self-end"
-          :to="{ name: 'admin-ecommerce-categories-slug', params: { slug: '_' } }"
+          :to="{ name: 'admin-ecommerce-products-slug', params: { slug: '_' } }"
         >
           <IconsPlus class="w-2 h-2" />
           <span>Add</span>

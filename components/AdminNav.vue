@@ -7,7 +7,7 @@ const navLinks = ref([
     title: 'Ecommerce',
     icon: 'IconsCartFill',
     subMenu: [
-      // { name: 'admin-ecommerce-products', title: 'Products', icon: 'IconsCartFill' },
+      { name: 'admin-ecommerce-products', title: 'Products', icon: 'IconsCartFill' },
       { name: 'admin-ecommerce-categories', title: 'Categories', icon: 'IconsClipboard' },
       { name: 'admin-ecommerce-attributes', title: 'Attributes', icon: 'IconsIdentification' },
     ],

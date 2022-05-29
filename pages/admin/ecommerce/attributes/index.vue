@@ -178,7 +178,7 @@ await fetchAllAttributes()
             class="btn btn__primary btn__pill px-3 py-05 text-xs items-self-end"
             :to="{ name: 'admin-ecommerce-categories-slug', params: { slug: '_' } }"
           >
-            <IconsPlus class="w2 h2" />
+            <IconsPlus class="w-2 h-2" />
             <span>Add</span>
           </NuxtLink>
         </template>

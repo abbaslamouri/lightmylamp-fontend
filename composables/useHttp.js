@@ -118,13 +118,44 @@ const useHttp = () => {
         })
       }
       console.log(response)
-      if (response.ok) return await response.json()
+      if (response.ok) {
+        const jsonRes = await response.json()
+        return jsonRes.doc ? jsonRes.doc : {}
+      }
       if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
       throw getErrorStr((await response.json()).errors)
     } catch (err) {
       console.log('MYERROR', err)
       errorMsg.value = err
       return {}
+    }
+  }
+
+  const deleteDoc = async (resource, id) => {
+    errorMsg.value = null
+    message.value = null
+    let response = null
+    // const token =
+    //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+    //     ? useCookie('auth').value.token
+    //     : null
+    try {
+      response = await fetch(`${config.apiUrl}/${resource}/${id}`, {
+        method: 'DELETE',
+        headers: new Headers({
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token && token.value ? token.value : ''}`,
+        }),
+      })
+
+      // console.log(response)
+      if (response.ok) return true
+      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+      throw getErrorStr((await response.json()).errors)
+    } catch (err) {
+      console.log('MYERROR', err)
+      errorMsg.value = err
+      return false
     }
   }
 
@@ -153,37 +184,10 @@ const useHttp = () => {
     } catch (err) {
       console.log('MYERROR', err)
       errorMsg.value = err
-      return {}
+      return false
     }
   }
 
-  const deleteDoc = async (resource, id) => {
-    errorMsg.value = null
-    message.value = null
-    let response = null
-    const token =
-      useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
-        ? useCookie('auth').value.token
-        : null
-    try {
-      response = await fetch(`${config.apiUrl}/${resource}/${id}`, {
-        method: 'DELETE',
-        headers: new Headers({
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token.value}`,
-        }),
-      })
-
-      // console.log(response)
-      if (response.ok) return true
-      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
-      throw getErrorStr((await response.json()).errors)
-    } catch (err) {
-      console.log('MYERROR', err)
-      errorMsg.value = err
-      return {}
-    }
-  }
   const saveMedia = async (payload) => {
     errorMsg.value = null
     message.value = null
