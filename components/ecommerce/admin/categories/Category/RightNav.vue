@@ -29,7 +29,6 @@ watch(
   (currentVal) => {
     updateParent()
   }
-  // { deep: true }
 )
 </script>
 

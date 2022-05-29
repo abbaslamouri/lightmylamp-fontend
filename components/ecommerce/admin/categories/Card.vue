@@ -12,7 +12,7 @@ const props = defineProps({
     type: Boolean,
   },
 })
-const emit = defineEmits(['setActions', 'categoryUpdated', 'deleteCategory'])
+const emit = defineEmits(['setActions', 'categoryUpdated', 'editCategory', 'deleteCategory'])
 
 const config = useRuntimeConfig()
 </script>
@@ -40,11 +40,13 @@ const config = useRuntimeConfig()
       </span>
       <span v-else>-</span>
     </td>
-    <td class="minw-12">
+    <td class="w-14">
       <EcommerceAdminRowActions
         :showAction="showAction"
+        showEdit
         @moreHoriz="$emit('setActions', { index: index, action: !showAction })"
-        @deleteAction="$emit('deleteAttribute', attribute._id)"
+        @editAction="$emit('editCategory', category.slug)"
+        @deleteAction="$emit('deleteCategory', category.id)"
         @cancel="$emit('setActions', { index: index, action: false })"
       />
     </td>
@@ -55,7 +57,6 @@ const config = useRuntimeConfig()
 @import '@/assets/scss/variables';
 
 td {
-  border-bottom: 1px solid $stone-300;
   padding: 2rem;
   text-align: center;
 }

@@ -27,20 +27,16 @@ const setActions = (payload) => {
   resetActions()
   showActionKeys.value[payload.index] = payload.action
 }
-const handleEditProduct = (slug) => {
-  resetActions()
-  router.push({ name: 'ecommerce-categories-slug', params: { slug } })
-}
 
 const deleteCategory = (categoryId) => {
-  resetActions()
   emit('deleteCategory', categoryId)
+  resetActions()
 }
 </script>
 
 <template>
   <div>
-    <div v-if="totalCount">
+    <div>
       <table class="text-xs shadow-md">
         <thead>
           <tr class="bg-slate-200">
@@ -60,37 +56,11 @@ const deleteCategory = (categoryId) => {
             :index="index"
             :showAction="showActionKeys[index]"
             @setActions="setActions"
-            @deletecategory="deleteCategory"
+            @deleteCategory="deleteCategory"
+            @editCategory="router.push({ name: 'admin-ecommerce-categories-slug', params: { slug: $event } })"
           />
         </tbody>
       </table>
-    </div>
-    <div v-else class="h-60vh flex-row items-center justify-center shadow-md">
-      <div class="empty-categories flex-col gap-2 bg-slate-50 p-4 br-5">
-        <h3 class="">Add categories and subcategories</h3>
-        <div class="">Create nested product categories with category images and descriptions</div>
-        <NuxtLink
-          class="btn btn__primary btn__pill px-3 py-05 text-xs items-self-end"
-          :to="{ name: 'index', params: { slug: ' ' } }"
-        >
-          <IconsPlus class="w2 h2" />
-          <span>Add</span>
-        </NuxtLink>
-      </div>
-    </div>
-
-    <div v-else class="h-60vh flex-row items-center justify-center shadow-md">
-      <div class="empty-categories flex-col gap-2 bg-slate-50 p-4 br-5">
-        <h3 class="">Add categories and subcategories</h3>
-        <div class="">Create nested product categories with category images and descriptions</div>
-        <NuxtLink
-          class="btn btn__primary btn__pill px-3 py-05 text-xs items-self-end"
-          :to="{ name: 'admin-ecommerce-categories-slug', params: { slug: ' ' } }"
-        >
-          <IconsPlus class="w-2 h-2" />
-          <span>Add</span>
-        </NuxtLink>
-      </div>
     </div>
   </div>
 </template>

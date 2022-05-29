@@ -170,7 +170,19 @@ await fetchAllAttributes()
         </table>
         <div class="text-center p-2 text-lg" v-if="!attributes.length">No results found</div>
       </div>
-      <EcommerceAdminAttributesEmptyMsg v-else />
+      <EcommerceAdminEmptyMsg v-else>
+        <template #header>Add attributes</template>
+        <template #default>
+          <div class="">Create attrubutes and attribute terms</div>
+          <NuxtLink
+            class="btn btn__primary btn__pill px-3 py-05 text-xs items-self-end"
+            :to="{ name: 'admin-ecommerce-categories-slug', params: { slug: '_' } }"
+          >
+            <IconsPlus class="w2 h2" />
+            <span>Add</span>
+          </NuxtLink>
+        </template>
+      </EcommerceAdminEmptyMsg>
     </div>
     <div class="w-full max-width-130">
       <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1" />

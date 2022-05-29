@@ -11,7 +11,7 @@ const useHttp = () => {
     return `<ul>${errorStr}</ul>`
   }
 
-  const fetchAll = async (resource, params) => {
+  const fetchAll = async (resource, params = {}) => {
     errorMsg.value = null
     message.value = null
     const token =
@@ -68,6 +68,7 @@ const useHttp = () => {
   }
 
   const saveDoc = async (resource, payload) => {
+    console.log('payload', payload)
     errorMsg.value = null
     message.value = null
     let response = null
@@ -77,6 +78,7 @@ const useHttp = () => {
         : null
     try {
       if (payload.id) {
+        console.log('PATCH')
         response = await fetch(`${config.apiUrl}/${resource}/${payload.id}`, {
           method: 'PATCH',
           body: JSON.stringify(payload),
@@ -86,6 +88,7 @@ const useHttp = () => {
           },
         })
       } else {
+        console.log('POST')
         response = await fetch(`${config.apiUrl}/${resource}`, {
           method: 'POST',
           body: JSON.stringify(payload),
@@ -134,6 +137,30 @@ const useHttp = () => {
     }
   }
 
+  const saveMedia = async (payload) => {
+    errorMsg.value = null
+    message.value = null
+    let response = null
+    const token =
+      useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+        ? useCookie('auth').value.token
+        : null
+    try {
+      response = await fetch(`${config.apiUrl}/media`, {
+        method: 'POST',
+        body: payload,
+      })
+      console.log(response)
+      if (response.ok) return await response.json()
+      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+      throw getErrorStr((await response.json()).errors)
+    } catch (err) {
+      console.log('MYERROR', err)
+      errorMsg.value = err
+      return {}
+    }
+  }
+
   const deleteDoc = async (resource, id) => {
     errorMsg.value = null
     message.value = null
@@ -161,7 +188,7 @@ const useHttp = () => {
     }
   }
 
-  return { fetchAll, fetchDoc, saveDoc, deleteDoc, deleteDocs }
+  return { fetchAll, fetchDoc, saveDoc, deleteDoc, deleteDocs, saveMedia }
 }
 
 export default useHttp

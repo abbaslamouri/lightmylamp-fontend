@@ -23,7 +23,7 @@ if (process.client) {
         <AdminNav />
       </aside>
     </transition>
-    <main class="" :class="{ full: !showAdminSidebar }">
+    <main :class="{ full: !showAdminSidebar }">
       <header class="flex-row items-center justify-between px-2 text-slate-50">
         <MobileNavToggler @hideAdminSidebar="showAdminSidebar = !showAdminSidebar" />
         <div>
@@ -68,6 +68,8 @@ if (process.client) {
 
     .content {
       flex: 1;
+      display: flex;
+      flex-direction: column;
       // min-height: 90vh;
       width: 100%;
       background-color: $slate-100;
