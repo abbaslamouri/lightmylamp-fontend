@@ -89,15 +89,11 @@ const useHttp = () => {
   }
 
   const saveDoc = async (resource, payload) => {
-    console.log('payload', payload)
     errorMsg.value = null
     message.value = null
     let response = null
-    // const token = useCookie('token') && useCookie('token').value ? useCookie('token').value : null
-    // console.log('TOKEN', token)
     try {
       if (payload.id) {
-        console.log('PATCH')
         response = await fetch(`${config.apiUrl}/${resource}/${payload.id}`, {
           method: 'PATCH',
           body: JSON.stringify(payload),
@@ -107,7 +103,6 @@ const useHttp = () => {
           }),
         })
       } else {
-        console.log('POST')
         response = await fetch(`${config.apiUrl}/${resource}`, {
           method: 'POST',
           body: JSON.stringify(payload),

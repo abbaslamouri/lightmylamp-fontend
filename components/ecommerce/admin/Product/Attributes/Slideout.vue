@@ -13,9 +13,6 @@ const current = JSON.stringify(product.value.attributes)
 
 const response = await fetchAll('attributes')
 if (response && response.docs) allAttributes.value = response.docs
-console.log('AA', allAttributes.value)
-
-// const { docs: allAttributes } = await $fetchAll('attributes', { fields: 'name,slug' })
 
 const removeVariantByTermId = (termId) => {
   // let j = 0
@@ -30,7 +27,7 @@ const removeVariantByTermId = (termId) => {
   // store.variants = store.variants.filter((el) => !el.discard)
 }
 
-const insertEmptyAttribute = (attribute = {}, defaultTerm = {}, terms = []) => {
+const insertAttribute = (attribute = {}, defaultTerm = {}, terms = []) => {
   if (product.value.attributes.length == allAttributes.value.length)
     return (errorMsg.value = 'You have used up all available attributes')
   product.value.attributes.push({
@@ -40,47 +37,28 @@ const insertEmptyAttribute = (attribute = {}, defaultTerm = {}, terms = []) => {
     enabled: true,
     variation: true,
   })
+  console.log(product.value)
 }
 
 const addAllAttributes = () => {
   for (const prop in allAttributes.value) {
     const attribute = allAttributes.value[prop]
-    const terms = allAttributes.value[prop].attributeterms
+    const terms = [...allAttributes.value[prop].attributeterms]
     const defaultTerm = allAttributes.value[prop].attributeterms[0]
-    insertEmptyAttribute(attribute, defaultTerm, terms)
-  }
-}
-
-const updateAttribute = (payload) => {
-  const { attribute, newAttributeId } = payload
-  console.log(payload)
-  const index = product.value.attributes.findIndex((a) => a.attribute._id == newAttributeId)
-  if (index !== -1) {
-    product.value.attributes[index].attribute = attribute
-    product.value.attributes[index].terms = []
-    ;(product.value.attributes[index].defaultTerm = attribute), attributeterms[0]
-    // emit('updateAttributes', product.value.attributes)
+    insertAttribute(attribute, defaultTerm, terms)
   }
 }
 
 const closeSlideout = () => {
-  if (current !== JSON.stringify(product.value.attributes)) {
-    showAlert(
-      'You have unsaved changes',
-      'Please save your changes before closing this window or click cancel to exit without saving.',
-      'toggleAttributesSlideout',
-      false
-    )
-  } else {
-    emit('toggleAttributesSlideout')
-  }
+  if (current == JSON.stringify(product.value.attributes)) emit('toggleAttributesSlideout')
+  window.alert('Please save your changes before closing this window or click cancel to exit without saving.')
 }
 
 const saveAttributes = async () => {
   if (current == JSON.stringify(product.value.attributes)) return emit('closeSlideout')
   const newAttributes = []
   for (const prop in product.value.attributes) {
-    if (!product.value.attributes[prop].attribute._id)
+    if (!product.value.attributes[prop].attribute.id)
       return (errorMsg.value = `Please select a value for attribute ${prop * 1 + 1} `)
     if (!product.value.attributes[prop].terms.length)
       return (errorMsg.value = `Attributes must contain at least one term.  Please select terms for attribute ${
@@ -99,37 +77,28 @@ const cancelAttributesUpdate = () => {
   emit('toggleAttributesSlideout')
 }
 
-const showDeleteAttributeAlert = (attributeIndex) => {
-  attributeToDelteIndex.value = attributeIndex
-  showAlert(
-    'Are you sure you want to delete this attribute?',
-    'You also have to delete all product variants associated with this attribute.',
-    'deleteAttribute',
-    true
+const deleteAttribute = (attributeIndex) => {
+  if (
+    !confirm(
+      'Are you sure you want to delete this attribute? You also have to delete all product variants associated with this attribute.'
+    )
   )
+    return
+  product.value.attributes.splice(attributeIndex, 1)
 }
 
-const deleteAttribute = () => {
-  product.value.attributes.splice(attributeToDelteIndex.value, 1)
-  alert.value.show = false
-  alert.value.action = ''
-}
 
-const showDeleteAllAttributesAlert = () => {
-  showAlert(
-    'Are you sure you want to delete all attributes',
-    'You also have to delete all product variants associated with this attribute.',
-    'deleteAllAttributes',
-    true
-  )
-}
 const deleteAllAttributes = () => {
+  if (
+    !confirm(
+      'Are you sure you want to delete all attributes? You also have to delete all product variants associated with this attribute.'
+    )
+  )
+    return
   product.value.attributes = []
-  alert.value.show = false
-  alert.value.action = ''
 }
 
-const handleAddTerm = (payload) => {
+const addTerm = (payload) => {
   const { attributeId, termId } = payload
   const index = product.value.attributes.findIndex((a) => a.attribute._id == attributeId)
   if (index !== -1) {
@@ -145,78 +114,35 @@ const handleAddTerm = (payload) => {
   }
 }
 
-const handleAddAllTerms = (attributeId) => {
+const addAllTerms = (attributeId) => {
   const index = product.value.attributes.findIndex((a) => a.attribute._id == attributeId)
   if (index !== -1) product.value.attributes[index].terms = allAttributeTerms.filter((t) => t.parent._id == attributeId)
 }
 
-const showdeleteTermAlert = (payload) => {
-  console.log(payload)
-  termToDeleteId.value = payload.termId
-  attributeIndex.value = payload.attributeIndex
-  showAlert(
-    'Are you sure you want to delete this attribute term?',
-    'You also have to delete all product variants associated with this attribute.',
-    'deleteTerm',
-    true
+const deleteTerm = async (payload) => {
+  if (
+    !confirm(
+      'Are you sure you want to remove all terms associated with this attribute?  You also have to delete all product variants associated with this attribute.'
+    )
   )
+    return
+  const index = product.value.attributes[payload.attributeIndex].terms.findIndex((t) => t.id == payload.termId)
+  if (index !== -1) product.value.attributes[payload.attributeIndex].terms.splice(index, 1)
+  console.log(product.value.attributes)
 }
 
-const deleteTerm = async () => {
-  const index = product.value.attributes[attributeIndex.value].terms.findIndex((t) => t._id == termToDeleteId.value)
-  if (index !== -1) product.value.attributes[attributeIndex.value].terms.splice(index, 1)
-  alert.value.show = false
-  alert.value.action = ''
-  attributeIndex.value = ''
-  termToDeleteId.value = null
 
-  // for (const prop in product.value.variants) {
-  //   const term = product.value.variants[prop].attrTerms.find((t) => t._id == termToDeleteId.value)
-  //   if (term) product.value.variants[prop].toDelete = true
-  // }
-  // product.value.variants = product.value.variants.filter((v) => !v.toDelete)
-}
-
-const showDeleteAllTermsAlert = (payload) => {
-  console.log(payload.attributeIndex)
-  attributeIndex.value = payload.attributeIndex
-  showAlert(
-    'Are you sure you want to remove all terms associated with this attribute?',
-    'You also have to delete all product variants associated with this attribute.',
-    'deleteAllTerms',
-    true
+const deleteAllTerms = (payload) => {
+  if (
+    !confirm(
+      'Are you sure you want to remove all terms associated with this attribute?  You also have to delete all product variants associated with this attribute.'
+    )
   )
+    return
+  product.value.attributes[payload.attributeIndex].terms = []
 }
 
-const deleteAllTerms = () => {
-  console.log(attributeIndex.value)
-  product.value.attributes[attributeIndex.value].terms = []
-  attributeIndex.value = ''
-  alert.value.show = false
-  alert.value.action = ''
-}
 
-const showAlert = (heading, paragraph, action, showCancelBtn) => {
-  alert.value.heading = heading
-  alert.value.paragraph = paragraph
-  alert.value.action = action
-  alert.value.showCancelBtn = showCancelBtn
-  alert.value.show = true
-}
-
-watch(
-  () => alert.value.show,
-  (currentVal) => {
-    if (currentVal === 'ok' && alert.value.action === 'toggleAttributesSlideout') {
-      alert.value.show = false
-      alert.value.action = ''
-    }
-    if (currentVal === 'ok' && alert.value.action === 'deleteAttribute') deleteAttribute()
-    if (currentVal === 'ok' && alert.value.action === 'deleteAllAttributes') deleteAllAttributes()
-    if (currentVal === 'ok' && alert.value.action === 'deleteTerm') deleteTerm()
-    if (currentVal === 'ok' && alert.value.action === 'deleteAllTerms') deleteAllTerms()
-  }
-)
 </script>
 
 <template>
@@ -232,7 +158,7 @@ watch(
           <div class="flex-row items-center justify-between bg-white p-2 br-3 shadow-md">
             <h2>Attributes</h2>
             <div class="flex-row gap-2">
-              <button class="btn btn__primary py-05 px-2 text-xs" @click.prevent="insertEmptyAttribute()">
+              <button class="btn btn__primary py-05 px-2 text-xs" @click.prevent="insertAttribute()">
                 Add Attribute
               </button>
               <button
@@ -245,7 +171,7 @@ watch(
               <button
                 class="btn btn__secondary py-05 px-2 text-xs"
                 v-if="product.attributes.length"
-                @click.prevent="showDeleteAllAttributesAlert"
+                @click.prevent="deleteAllAttributes"
               >
                 deleted All Attributes
               </button>
@@ -255,12 +181,11 @@ watch(
             <EcommerceAdminProductAttributesList
               v-if="product.attributes.length"
               :allAttributes="allAttributes"
-              @deleteAttribute="showDeleteAttributeAlert"
-              @addTerm="handleAddTerm"
-              @addAllTerms="handleAddAllTerms"
-              @deleteTerm="showdeleteTermAlert"
-              @deleteAllTerms="showDeleteAllTermsAlert"
-              @updateAttribute="updateAttribute"
+              @deleteAttribute="deleteAttribute"
+              @addTerm="addTerm"
+              @addAllTerms="addAllTerms"
+              @deleteTerm="deleteTerm"
+              @deleteAllTerms="deleteAllTerms"
             />
             <EcommerceAdminProductAttributesEmptyMsg v-else :allAttributes="allAttributes" />
           </div>

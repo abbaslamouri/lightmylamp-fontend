@@ -13,7 +13,7 @@ const  product  = useState('product')
 
 const setAttribute = (event) => {
   product.value.attributes[props.attributeIndex].attribute = props.allAttributes.find(
-    (a) => a._id === event.target.value
+    (a) => a.id === event.target.value
   )
   product.value.attributes[props.attributeIndex].defaultTerm =
     product.value.attributes[props.attributeIndex].attribute.attributeterms[0]
@@ -28,12 +28,12 @@ const setAttribute = (event) => {
         <option value=""></option>
         <option
           v-for="option in allAttributes.map((a) => {
-            return { key: a._id, name: a.name }
+            return { key: a.id, name: a.name }
           })"
           :key="option.key"
           :value="option.key"
-          :selected="product.attributes[attributeIndex].attribute._id == option.key"
-          :disabled="product.attributes.find((a) => a.attribute._id == option.key)"
+          :selected="product.attributes[attributeIndex].attribute.id == option.key"
+          :disabled="product.attributes.find((a) => a.attribute.id == option.key)"
         >
           {{ option.name }}
         </option>

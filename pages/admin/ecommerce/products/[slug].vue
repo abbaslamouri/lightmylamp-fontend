@@ -21,12 +21,14 @@ const product = useState('product', () => {
 })
 const slug = route.params.slug === '_' ? null : route.params.slug
 
-// if (!slug) product.value = { productType: 'simple', gallery: [], attributes: [], variants: [], categories: [] }
 if (slug) {
   response = await fetchAll('products', { slug })
-  product.value = response.docs[0]
+  if (response.docs) product.value = response.docs[0]
+  if (product.value.id) {
+    response = await fetchAll('variants', { product: product.value.id })
+    if (response.docs) product.value.variants = response.docs
+  }
 }
-
 const setImageGallery = async (gallery) => {
   if (!gallery.length) return
   const formData = new FormData()
@@ -40,6 +42,7 @@ const setImageGallery = async (gallery) => {
     product.value.gallery.push(response.media[prop])
   }
 }
+console.log(product.value)
 
 const saveProduct = async () => {
   console.log(product.value)
@@ -90,7 +93,7 @@ const saveProduct = async () => {
 <template>
   <div class="hfull flex-col items-center gap-2 p-3">
     <Title>{{ pageTitle }}</Title>
-    {{ product }}
+    <!-- {{ product }} -->
     <header class="flex-col gap-2 w-full max-width-130">
       <div class="go-back" id="product-go-back">
         <NuxtLink class="admin-link" :to="{ name: 'admin-ecommerce-products' }">
@@ -122,33 +125,6 @@ const saveProduct = async () => {
             @mediaSelected="setImageGallery"
           />
         </section>
-        <!-- <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
-          <div class="flex-row items-center justify-between text-sm mb-1">
-            <div class="uppercase inline-block border-b-stone-300 font-bold pb05">Image Gallery</div>
-            <div></div>
-          </div>
-          <div class="flex-col flex-col items-center gap-2">
-            <div class="intro flex-row items-center gap-1 bg-slate-200 py-1 px-2 br3 text-sm" v-if="galleryIntro">
-              <IconsInfo class="w-3 h-3 fill-sky-600" />
-              <p>{{ galleryIntro }}</p>
-            </div>
-            <EcommerceImageGallery
-              :gallery="product.gallery"
-              :galleryIntro="galleryIntro"
-              galleryType="product"
-              @removeGalleryImage="product.gallery.splice($event, 1)"
-              @setGalleryImage="product.gallery[$event.index] = $event.value"
-            />
-            <div class="image-select-actions">
-              <button class="btn btn__image-select" @click.prevent="handleNewMediaSelectBtnClicked">
-                <IconsImage />
-                <span> Select New Images </span>
-              </button>
-            </div>
-            <p class="text-sm">PNG, JPG, and GIF Accepted</p>
-          </div>
-        </section> -->
-
         <EcommerceAdminProductAttributesContent
           v-if="product.id && product.productType === 'variable'"
           @toggleAttributesSlideout="showAttributesSlideout = $event"
@@ -159,15 +135,15 @@ const saveProduct = async () => {
           @saveAttributes="saveProduct"
         />
 
-        <!-- <EcommerceProductVariantsContent
+        <EcommerceAdminProductVariantsContent
           @toggleVariantsSlideout="showVariantsSlideout = $event"
-          v-if="product._id && product.productType === 'variable' && product.attributes.length"
-        /> -->
-        <!-- <EcommerceProductVariantsSlideout
+          v-if="product.id && product.productType === 'variable' && product.attributes.length"
+        />
+        <EcommerceAdminProductVariantsSlideout
           v-if="showVariantsSlideout"
           @toggleVariantsSlideout="showVariantsSlideout = $event"
           @saveVariants="saveProduct"
-        /> -->
+        />
         <!-- <EcommerceProductDetails :product="product" @updateDetails="product.value = { ...product.value, ...$event }" /> -->
 
         <!-- <EcommerceProductShippingOptions :product="product" /> -->

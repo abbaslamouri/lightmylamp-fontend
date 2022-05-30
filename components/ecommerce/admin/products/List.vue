@@ -9,6 +9,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['deleteProduct'])
 
+const config = useRuntimeConfig()
+
 const router = useRouter()
 
 const showActionKeys = ref([])
@@ -56,7 +58,7 @@ const deleteProduct = (productId) => {
             <img
               class="w-full hfull contain"
               v-if="product.gallery.length && product.gallery[0] && product.gallery[0].mimetype.includes('image')"
-              :src="`${product.gallery[0].path}`"
+              :src="`${config.backendUrl}/${product.gallery[0].path}/${product.gallery[0].name}`"
             />
             <img v-else class="w-full hfull contain" :src="`/placeholder.png`" />
           </div>

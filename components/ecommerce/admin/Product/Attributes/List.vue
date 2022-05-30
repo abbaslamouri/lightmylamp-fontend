@@ -40,7 +40,7 @@ const deleteAttribute = (attributeIndex) => {
         <th class="text-right minw12">Actions</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="bg-slate-50">
       <tr
         class="border border-b-stone-400"
         v-for="(attribute, index) in product.attributes"
@@ -89,8 +89,12 @@ const deleteAttribute = (attributeIndex) => {
 </template>
 
 <style lang="scss" scoped>
+
+th {
+  padding:1rem;
+}
 td {
   padding: 0.5rem;
-  border: 1px solid red;
+  // border: 1px solid red;
 }
 </style>
