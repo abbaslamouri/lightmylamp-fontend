@@ -25,7 +25,7 @@ else category.value = response.docs[0]
 response = await fetchAll('categories')
 categories.value = response.docs
 
-const setImageGallery = async (gallery) => {
+const addImagesToGallery = async (gallery) => {
   if (!gallery.length) return
   const formData = new FormData()
   for (const prop in gallery) {
@@ -76,7 +76,7 @@ const saveCategory = async () => {
             :galleryIntro="galleryIntro"
             @removeGalleryImage="category.gallery.splice($event, 1)"
             @setGalleryImage="category.gallery[$event.index] = $event.value"
-            @mediaSelected="setImageGallery"
+            @mediaSelected="addImagesToGallery"
           />
         </section>
       </div>

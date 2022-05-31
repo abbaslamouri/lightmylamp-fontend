@@ -50,7 +50,7 @@ const addAllAttributes = () => {
 }
 
 const closeSlideout = () => {
-  if (current == JSON.stringify(product.value.attributes)) emit('toggleAttributesSlideout')
+  if (current == JSON.stringify(product.value.attributes)) return emit('toggleAttributesSlideout')
   window.alert('Please save your changes before closing this window or click cancel to exit without saving.')
 }
 
@@ -86,7 +86,6 @@ const deleteAttribute = (attributeIndex) => {
     return
   product.value.attributes.splice(attributeIndex, 1)
 }
-
 
 const deleteAllAttributes = () => {
   if (
@@ -131,7 +130,6 @@ const deleteTerm = async (payload) => {
   console.log(product.value.attributes)
 }
 
-
 const deleteAllTerms = (payload) => {
   if (
     !confirm(
@@ -141,8 +139,6 @@ const deleteAllTerms = (payload) => {
     return
   product.value.attributes[payload.attributeIndex].terms = []
 }
-
-
 </script>
 
 <template>

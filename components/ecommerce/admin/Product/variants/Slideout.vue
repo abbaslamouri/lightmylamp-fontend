@@ -19,14 +19,14 @@ const showSalePriceInput = ref(false)
 // provide('allAttributeTerms', allAttributeTerms)
 const response = await fetchAll('attributes')
 if (response.docs) allAttributes.value = response.docs
-// provide('allAttributes', allAttributes)
-console.log(allAttributes)
+provide('allAttributes', allAttributes)
+// console.log(allAttributes)
 console.log(product.value)
 const current = JSON.stringify(product.value.variants)
 
 const variantBase = (terms = []) => {
   return {
-    product: product.value._id,
+    productId: product.value.id,
     attrTerms: terms,
     enabled: true,
     shipping: {
@@ -36,13 +36,13 @@ const variantBase = (terms = []) => {
     price: product.value.price,
     salePrice: product.value.salePrice,
     sku: '',
-    gallery: [],
+    gallery: product.value.gallery[0] ? [{ ...product.value.gallery[0] }] : [],
   }
 }
 
 const getVariantAttribute = (term, j) => {
   if (Object.values(term).length) {
-    return allAttributes.find((a) => a._id == term.parent._id)
+    return allAttributes.find((a) => a.id == term.parent.id)
   } else {
     return product.value.attributes[j].attribute
   }
@@ -97,37 +97,16 @@ const checkDuplicateVariants = () => {
   return true
 }
 
-const preBulkVariants = () => {
-  if (product.value.variants.length)
-    showAlert(
-      'Are you sure you want to recreate all variants?',
-      'This action will overwrite all existing variants',
-      'bulkVariants',
-      true
-    )
-  else bulkAddVariants()
-}
-
-const bulkAddVariants = () => {
-  let terms = []
-  if (!product.value.attributes.length)
-    return (errorMsg.value = 'I do not know how you got here but you need to create attributes first')
-  const filteredAttributes = product.value.attributes.filter((a) => a.enabled && a.variation)
-  for (const prop in filteredAttributes) {
-    if (!filteredAttributes[prop].terms.length)
-      return (errorMsg.value = `All attributes must contain terms.  Attribute ${filteredAttributes[prop].attribute.name} does not contain any terms.  Please delete this attribute or add terms`)
-  }
-  terms = filteredAttributes.map((el) => [...el.terms])
-  if (getCombinations(terms)[0].length)
-    product.value.variants = [...getCombinations(terms)].map((el) => {
-      return variantBase([...el])
-    })
-
-  console.log('PV', product.value.variants)
-
-  alert.value.show = false
-  alert.value.action = ''
-}
+// const bulkAddVariants = () => {
+//   if (product.value.variants.length)
+//     showAlert(
+//       'Are you sure you want to recreate all variants?',
+//       'This action will overwrite all existing variants',
+//       'bulkVariants',
+//       true
+//     )
+//   else bulkAddVariants()
+// }
 
 const addSingleVariant = () => {
   const filteredAttributes = product.value.attributes.filter((a) => a.enabled && a.variation)
@@ -150,11 +129,35 @@ const addSingleVariant = () => {
   console.log('PPVV', product.value.variants)
 }
 
+const bulkAddVariants = () => {
+  if (product.value.variants.length) {
+    if (!confirm('Are you sure you want to recreate all variants? This action will overwrite all existing variants'))
+      return
+  }
+  let terms = []
+  if (!product.value.attributes.length)
+    return (errorMsg.value = 'I do not know how you got here but you need to create attributes first')
+  const filteredAttributes = product.value.attributes.filter((a) => a.enabled && a.variation)
+  for (const prop in filteredAttributes) {
+    if (!filteredAttributes[prop].terms.length)
+      return (errorMsg.value = `All attributes must contain terms.  Attribute ${filteredAttributes[prop].attribute.name} does not contain any terms.  Please delete this attribute or add terms`)
+  }
+  terms = filteredAttributes.map((el) => [...el.terms])
+  if (getCombinations(terms)[0].length)
+    product.value.variants = [...getCombinations(terms)].map((el) => {
+      return variantBase([...el])
+    })
+  console.log('PV', product.value.variants)
+
+  // alert.value.show = false
+  // alert.value.action = ''
+}
+
 const updateVariants = async () => {
   // if (!checkMissingVariantTerms() || !checkDuplicateVariants()) return
   for (const i in product.value.variants) {
     for (const j in product.value.variants[i].gallery) {
-      const index = product.value.gallery.findIndex((m) => m._id == product.value.variants[i].gallery[j]._id)
+      const index = product.value.gallery.findIndex((m) => m.id == product.value.variants[i].gallery[j].id)
       if (index === -1) product.value.gallery.push(product.value.variants[i].gallery[j])
     }
   }
@@ -184,16 +187,18 @@ const setSalePrices = (price) => {
 }
 
 const closeSlideout = () => {
-  if (current !== JSON.stringify(product.value.variants)) {
-    showAlert(
-      'You have unsaved changes',
-      'Please save your changes before closing this window or click cancel to exit without saving',
-      'closeSlideout',
-      false
-    )
-  } else {
-    emit('toggleVariantsSlideout', false)
-  }
+  if (current == JSON.stringify(product.value.variants)) return emit('toggleVariantsSlideout', false)
+  window.alert('Please save your changes before closing this window or click cancel to exit without saving.')
+  // if (current !== JSON.stringify(product.value.variants)) {
+  //   showAlert(
+  //     'You have unsaved changes',
+  //     'Please save your changes before closing this window or click cancel to exit without saving',
+  //     'closeSlideout',
+  //     false
+  //   )
+  // } else {
+  //   emit('toggleVariantsSlideout', false)
+  // }
 }
 
 const cancelVariantUpdate = () => {
@@ -205,13 +210,13 @@ const handleVariantsAction = () => {
   if (!variantsActionSelect.value) return (errorMsg.value = 'Please select an action')
   switch (variantsActionSelect.value) {
     case 'create-all':
-      preBulkVariants()
+      bulkAddVariants()
       break
     case 'add-variant':
       addSingleVariant()
       break
     case 'delete-all':
-      showAlert('Are you sure?', 'All variants associated with this product will be deleted', 'removeAllVariants', true)
+      removeAllVariants()
       break
     case 'toggle-enabled':
       toggleEnabled()
@@ -228,39 +233,41 @@ const handleVariantsAction = () => {
   }, 10)
 }
 
-const showRemoveVariantAlert = (variantIndex) => {
-  variantToDelteIndex.value = variantIndex * 1
-  showAlert('Are you sure you want to delete this product variant?', '', 'removeVariant', true)
-}
+// const showRemoveVariantAlert = (variantIndex) => {
+//   variantToDelteIndex.value = variantIndex * 1
+//   showAlert('Are you sure you want to delete this product variant?', '', 'removeVariant', true)
+// }
 
-const removeVariant = () => {
-  product.value.variants.splice(variantToDelteIndex.value, 1)
-  alert.value.show = false
+const removeVariant = (variantIndex) => {
+  if (!confirm('Are you sure you want to delete this product variant?')) return
+  product.value.variants.splice(variantIndex * 1, 1)
+  // alert.value.show = false
 }
 
 const removeAllVariants = async () => {
+  if (!confirm('Are you sure? All variants associated with this product will be deleted')) return
   product.value.variants = []
-  alert.value.show = false
+  // alert.value.show = false
 }
 
-const showAlert = (heading, paragraph, action, showCancelBtn) => {
-  alert.value.heading = heading
-  alert.value.paragraph = paragraph
-  alert.value.action = action
-  alert.value.showCancelBtn = showCancelBtn
-  alert.value.show = true
-}
+// const showAlert = (heading, paragraph, action, showCancelBtn) => {
+//   alert.value.heading = heading
+//   alert.value.paragraph = paragraph
+//   alert.value.action = action
+//   alert.value.showCancelBtn = showCancelBtn
+//   alert.value.show = true
+// }
 
-watch(
-  () => alert.value.show,
-  (currentVal) => {
-    if (currentVal === 'ok' && alert.value.action === 'bulkVariants') bulkAddVariants()
-    if (currentVal === 'ok' && alert.value.action === 'removeVariant') removeVariant()
-    if (currentVal === 'ok' && alert.value.action === 'removeAllVariants') removeAllVariants()
-    if (currentVal === 'ok' && alert.value.action === 'closeSlideout') alert.value.show = false
-  },
-  { deep: true }
-)
+// watch(
+//   () => alert.value.show,
+//   (currentVal) => {
+//     if (currentVal === 'ok' && alert.value.action === 'bulkVariants') bulkAddVariants()
+//     if (currentVal === 'ok' && alert.value.action === 'removeVariant') removeVariant()
+//     if (currentVal === 'ok' && alert.value.action === 'removeAllVariants') removeAllVariants()
+//     if (currentVal === 'ok' && alert.value.action === 'closeSlideout') alert.value.show = false
+//   },
+//   { deep: true }
+// )
 </script>
 
 <template>
@@ -296,15 +303,12 @@ watch(
                 @setRegularPrices="setRegularPrices"
                 @setSalePrices="setSalePrices"
               />
-              <button class="btn btn__primary min-w-12 justify-center" @click="preBulkVariants">Bulk&nbsp;Add</button>
+              <button class="btn btn__primary min-w-12 justify-center" @click="bulkAddVariants">Bulk&nbsp;Add</button>
             </div>
           </div>
           <div>
-            <EcommerceAdminProductVariantsEmptyMsg
-              v-if="!product.variants.length"
-              @togglevariantsSlideout="$emit('togglevariantsSlideout')"
-            />
-            <EcommerceAdminProductVariantsList v-else @removeVariant="showRemoveVariantAlert" />
+            <EcommerceAdminProductVariantsList v-if="product.variants.length" @removeVariant="removeVariant" />
+            <EcommerceAdminProductVariantsEmptyMsg v-else @togglevariantsSlideout="$emit('togglevariantsSlideout')" />
           </div>
         </div>
         <div class="flex-row items-center justify-end gap-2 p-1 bg-slate-400">

@@ -1,6 +1,5 @@
 <script setup>
-const { product } = useStore()
-</script>
+const product  = useState('product')</script>
 
 <template>
   <section class="shadow-md w-full bg-white p-2 br-5" id="stock">

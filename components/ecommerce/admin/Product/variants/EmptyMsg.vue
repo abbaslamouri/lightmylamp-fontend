@@ -1,8 +1,7 @@
 <script setup>
 defineEmits(['closeSlideout'])
 
-const { product } = useStore()
-</script>
+const product  = useState('product')</script>
 
 <template>
   <div class="flex-row items-center justify-center mt-10 text-sm">

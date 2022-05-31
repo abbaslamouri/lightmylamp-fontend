@@ -7,7 +7,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['updateDetails'])
-// const { category } = useStore()
 
 const details = reactive({
   name: props.category.name ? props.category.name : '',

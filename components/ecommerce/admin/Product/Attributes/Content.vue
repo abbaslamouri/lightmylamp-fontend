@@ -1,6 +1,5 @@
 <script setup>
-const { product } = useStore()
-
+const product  = useState('product')
 defineEmits(['toggleAttributesSlideout'])
 </script>
 

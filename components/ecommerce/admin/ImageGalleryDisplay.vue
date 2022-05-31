@@ -11,6 +11,7 @@ const props = defineProps({
   },
   galleryType: {
     type: String,
+    default: 'product',
   },
 })
 
@@ -27,7 +28,6 @@ const config = useRuntimeConfig()
 
 // const state = inject('state')
 
-// const store = useStore()
 // const currentGallery = ref([])
 const draggableElements = ref([])
 const pickIndex = ref(null)
@@ -156,20 +156,23 @@ const setFeaturedImage = (event) => {
 
 .gallery {
   display: grid;
-  grid-template-columns: repeat(20, minmax(0, 1fr));
+  grid-template-columns: repeat(16, minmax(0, 1fr));
   gap: 2rem;
   padding: 2rem;
   border: 1px solid $slate-200;
   border-radius: 5px;
 
   .thumb {
-    grid-column: span 3 / span 3;
-    grid-row: span 3 / span 3;
+    grid-column: span 4 / span 4;
+    grid-row: span 4 / span 4;
     display: grid;
-    grid-template-rows: repeat(3, 1fr);
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     &.product {
-      &:nth-of-type(1),
+      &:nth-of-type(1){
+        grid-column: span 8 / span 8;
+        grid-row: span 8 / span 8;
+      }
       &:nth-of-type(2),
       &:nth-of-type(3),
       &:nth-of-type(4),

@@ -76,6 +76,7 @@ const deleteProduct = (productId) => {
             @moreHoriz="setActions({ index: index, action: !showActionKeys[index] })"
             @deleteAction="deleteProduct(product.id)"
             @editAction="router.push({ name: 'admin-ecommerce-products-slug', params: { slug: product.slug } })"
+            @cancel="resetActions"
           />
         </td>
       </tr>

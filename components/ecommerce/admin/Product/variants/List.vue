@@ -1,11 +1,12 @@
 <script setup>
 const emit = defineEmits(['removeVariant', 'saveVariants', 'closeSlideout'])
+const config = useRuntimeConfig()
 
-// const allAttributes = inject('allAttributes')
+const allAttributes = inject('allAttributes')
 
 const showVariantEditSlideoutKeys = ref([])
 
-const { product } = useStore()
+const product = useState('product')
 const showActionKeys = ref([])
 
 const resetActions = () => {
@@ -19,7 +20,7 @@ const setActions = (payload) => {
   showActionKeys.value[payload.index] = payload.action
 }
 
-const handleRemoveVariant = (variantIndex) => {
+const removeVariant = (variantIndex) => {
   resetActions()
   emit('removeVariant', variantIndex)
 }
@@ -56,20 +57,20 @@ const handleSaveVariant = (event) => {
     </thead>
     <tbody>
       <tr v-for="(variant, index) in product.variants" :key="`variant-${index}`">
-        <td>
+        <td class="w-4 text-center">
           <div class="bg-slate-200 p-1 br-3">{{ index + 1 }}</div>
         </td>
         <td class="w-5 h-5">
           <img
             class="w-full hfull contain"
             v-if="variant.gallery[0]"
-            :src="variant.gallery[0].path"
+            :src="`${config.backendUrl}/${variant.gallery[0].path}/${variant.gallery[0].name}`"
             alt="Variant Image"
           />
           <img class="w-full h-full contain" v-else src="/placeholder.png" alt="Variant Image" />
         </td>
-        <td>
-          <div class="flex-row gap1">
+        <td class="px-05">
+          <div class="flex-row gap-1">
             <div class="flex-row" v-for="(term, j) in product.variants[index].attrTerms" :key="term">
               <div class="attribute bg-slate-400">
                 {{ getVariantAttribute(term, j).name }}
@@ -80,23 +81,24 @@ const handleSaveVariant = (event) => {
             </div>
           </div>
         </td>
-        <td class="">{{ variant.enabled ? 'Enabled' : 'Disabled' }}</td>
-        <td>
+        <td class="w-6 text-center">{{ variant.enabled ? 'Enabled' : 'Disabled' }}</td>
+        <td class="w-8 text-center">
           <div v-if="!product.manageInventory">&infin;</div>
           <div v-else>{{ product.variants[index].stockQty }}</div>
         </td>
-        <td>{{ product.variants[index].price }}</td>
-        <td class="">{{ product.variants[index].salePrice }}</td>
-        <td class="">{{ product.variants[index].sku }}</td>
-        <td>
-          <EcommerceActions
+        <td class="w-6 text-center">{{ product.variants[index].price }}</td>
+        <td class="w-6 text-center">{{ product.variants[index].salePrice }}</td>
+        <td class="w-6 text-center">{{ product.variants[index].sku }}</td>
+        <td class="w-12">
+          <EcommerceAdminRowActions
             :showAction="showActionKeys[index]"
             :showEdit="true"
             @moreHoriz="setActions({ index: index, action: !showActionKeys[index] })"
-            @deleteAction="handleRemoveVariant(index)"
+            @deleteAction="removeVariant(index)"
             @editAction="openVariantEditSlideout(index)"
+            @cancel="resetActions"
           />
-          <EcommerceProductVariantsEditSlideout
+          <EcommerceAdminProductVariantsEditSlideout
             v-if="showVariantEditSlideoutKeys[index]"
             :index="index"
             @toggleVariantEditSlideout="showVariantEditSlideoutKeys[index] = $event"
@@ -110,6 +112,9 @@ const handleSaveVariant = (event) => {
 
 <style lang="scss" scoped>
 @import '@/assets/scss/variables';
+td {
+  border: 1px solid red;
+}
 
 .attribute {
   color: white;

@@ -5,8 +5,9 @@ const props = defineProps({
     required: true,
   },
   galleryIntro: String,
+  galleryType: String,
 })
-const emit = defineEmits(['setGalleryImage', 'mediaSelected', 'removeGalleryImage'])
+const emit = defineEmits(['setGalleryImage', 'mediaSelected', 'removeGalleryImage', 'selectFromProductGallery'])
 
 const showDropZone = ref(false)
 
@@ -35,10 +36,20 @@ const emitMediaSelected = (event) => {
         @setGalleryImage="$emit('setGalleryImage', $event)"
       />
       <div class="w-full flex-col items-center gap-2">
-        <button class="btn btn__image-select" @click.prevent="showDropZone = true">
-          <IconsImage />
-          <span> Select New Images </span>
-        </button>
+        <div class="flex-row gap-2">
+          <button class="btn btn__image-select" @click.prevent="showDropZone = true">
+            <IconsImage />
+            <span> Select New Images </span>
+          </button>
+          <button
+            class="btn btn__image-select"
+            @click.prevent="$emit('selectFromProductGallery')"
+            v-if="galleryType == 'variant'"
+          >
+            <IconsImage />
+            <span> Select From Product Images </span>
+          </button>
+        </div>
         <EcommerceDropZone
           v-if="showDropZone"
           class="w-full"

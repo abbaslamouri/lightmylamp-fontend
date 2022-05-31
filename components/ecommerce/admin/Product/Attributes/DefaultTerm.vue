@@ -9,8 +9,7 @@ const props = defineProps({
   },
 })
 
-const { product } = useStore()
-
+const product  = useState('product')
 const setDefaultTerm = (event) => {
   product.value.attributes[props.attributeIndex].defaultTerm = product.value.attributes[
     props.attributeIndex

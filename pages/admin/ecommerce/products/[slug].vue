@@ -29,7 +29,7 @@ if (slug) {
     if (response.docs) product.value.variants = response.docs
   }
 }
-const setImageGallery = async (gallery) => {
+const addImagesToGallery = async (gallery) => {
   if (!gallery.length) return
   const formData = new FormData()
   for (const prop in gallery) {
@@ -42,7 +42,6 @@ const setImageGallery = async (gallery) => {
     product.value.gallery.push(response.media[prop])
   }
 }
-console.log(product.value)
 
 const saveProduct = async () => {
   console.log(product.value)
@@ -68,7 +67,7 @@ const saveProduct = async () => {
 // }
 
 // Set category gallery
-// const setImageGallery = async (media) => {
+// const addImagesToGallery = async (media) => {
 //   // console.log('mediap', media)
 //   // console.log(product.value)
 //   for (const prop in media) {
@@ -84,7 +83,7 @@ const saveProduct = async () => {
 //   () => galleryMedia.value,
 //   (currentVal) => {
 //     console.log(currentVal)
-//     if (mediaReference.value === 'productMedia') setImageGallery(currentVal)
+//     if (mediaReference.value === 'productMedia') addImagesToGallery(currentVal)
 //   },
 //   { deep: true }
 // )
@@ -122,7 +121,7 @@ const saveProduct = async () => {
             :galleryIntro="galleryIntro"
             @removeGalleryImage="product.gallery.splice($event, 1)"
             @setGalleryImage="product.gallery[$event.index] = $event.value"
-            @mediaSelected="setImageGallery"
+            @mediaSelected="addImagesToGallery"
           />
         </section>
         <EcommerceAdminProductAttributesContent

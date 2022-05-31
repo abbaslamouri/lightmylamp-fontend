@@ -11,7 +11,7 @@ const props = defineProps({
 
 const emit = defineEmits(['deleteTerm', 'deleteAllTerms'])
 
-const { product } = useStore()
+const product = useState('product')
 const termSelectId = ref('')
 
 const handleAddTerm = () => {
@@ -29,7 +29,6 @@ const deleteTerm = (termId) => {
 const deleteAllTerms = () => {
   emit('deleteAllTerms', { attributeIndex: props.attributeIndex })
 }
-
 </script>
 
 <template>

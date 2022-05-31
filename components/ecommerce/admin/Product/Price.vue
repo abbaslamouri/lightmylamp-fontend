@@ -1,5 +1,5 @@
 <script setup>
-const { product } = useStore()
+const product  = useState('product')
 </script>
 
 <template>
