@@ -2,10 +2,11 @@
 const route = useRoute()
 const config = useRuntimeConfig()
 const { fetchAll, deleteDoc, deleteDocs } = useHttp()
-const { message, errorMsg, alert, showModal, showMediaSelector, galleryMedia } = useAppState()
+const { message, errorMsg } = useAppState()
 const selectedMedia = ref([])
 const media = ref([])
-const mediaTotalCount = ref(0)
+const count = ref(0)
+const totalCount = ref(0)
 const folders = ref([])
 const selectedFolder = ref({})
 // const folderToDelete = ref(null)
@@ -17,9 +18,10 @@ const perPage = ref(13)
 // const mediaSortOrder = ref('-')
 const keyword = ref('')
 const showDropZone = ref(false)
+// const showModal = ref(false)
 const ulploadItems = ref([])
-const folderFields = 'name, slug, path'
-const mediaFields = 'name, slug, folder, path, url, mimetype'
+const folderFields = 'id, name, slug'
+const fields = 'id, name, slug, folder, path, mimetype'
 let response = ''
 
 const folderSort = reactive({
@@ -49,9 +51,9 @@ const folderParams = computed(() => {
   }
 })
 
-const mediaParams = computed(() => {
+const params = computed(() => {
   const params = {
-    fields: mediaFields,
+    fields,
     page: page.value,
     limit: perPage.value,
     sort: `${mediaSort.order}${mediaSort.field}`,
@@ -64,25 +66,17 @@ const mediaParams = computed(() => {
 })
 
 const pages = computed(() =>
-  mediaTotalCount.value % perPage.value
-    ? parseInt(mediaTotalCount.value / perPage.value) + 1
-    : parseInt(mediaTotalCount.value / perPage.value)
+  totalCount.value % perPage.value
+    ? parseInt(totalCount.value / perPage.value) + 1
+    : parseInt(totalCount.value / perPage.value)
 )
 
-const overallFileUploadProgress = computed(() => {
-  let sum = 0
-  for (const prop in ulploadItems.value) {
-    sum = sum + ulploadItems.value[prop].progress
-  }
-  return ulploadItems.value.length ? sum / ulploadItems.value.length : 0
-})
+console.log(errorMsg.value)
 
-const fetchAllFolders = async () => {
+const fetchFolders = async () => {
   response = await fetchAll('media/folders', folderParams.value)
   folders.value = response.docs
   console.log(folders.value)
-  // count.value = response.results
-  // totalCount.value = response.totalCount
 }
 
 // const fetchFolders = async () => {
@@ -101,25 +95,32 @@ const fetchAllFolders = async () => {
 //   }
 // }
 
-const fetchAllMedia = async () => {
-  response = await fetchAll('media', mediaParams.value)
+const fetchMedia = async () => {
+  response = await fetchAll('media', params.value)
   media.value = response.docs
-  console.log(folders.value)
-  // count.value = response.results
-  // totalCount.value = response.totalCount
+  count.value = response.results
+  totalCount.value = response.totalCount
 }
+
+const overallFileUploadProgress = computed(() => {
+  let sum = 0
+  for (const prop in ulploadItems.value) {
+    sum = sum + ulploadItems.value[prop].progress
+  }
+  return ulploadItems.value.length ? sum / ulploadItems.value.length : 0
+})
 
 // const fetchMedia = async () => {
 //   errorMsg.value = null
 //   message.value = null
 //   try {
 //     const { data, pending, error } = await useFetch(`${config.API_URL}/media/`, {
-//       params: mediaParams.value,
+//       params: params.value,
 //     })
 //     if (error.value) throw error.value
 //     console.log(data.value)
 //     media.value = data.value.docs
-//     mediaTotalCount.value = data.value.totalCount
+//     totalCount.value = data.value.totalCount
 //   } catch (err) {
 //     console.log(err)
 //     // errorMsg.value = err.data.message
@@ -134,53 +135,57 @@ const handleFileUploadBtnClicked = () => {
 
 // Handles meia upload
 const handleUplodMedia = async (files) => {
-  showModal.value = true
+  console.log(files)
+  // showModal.value = true
   showDropZone.value = false
   errorMsg.value = ''
   message.value = ''
   ulploadItems.value = []
-
   for (const prop in Array.from(files)) {
-    ulploadItems.value[prop] = {}
-    ulploadItems.value[prop].name = files[prop].name
-    ulploadItems.value[prop].mimetype = files[prop].type
-    ulploadItems.value[prop].size = files[prop].size
-    ulploadItems.value[prop].status = 'uploading'
-    ulploadItems.value[prop].progress = 0
-    const xhr = new XMLHttpRequest()
-    xhr.open('POST', `${config.API_URL}/media`, true)
-    xhr.responseType = 'json'
-
-    const formData = new FormData()
-    formData.append('file', files[prop], files[prop].name)
-    formData.append('folder', selectedFolder.value._id)
-
-    xhr.onerror = (error) => {
-      errorMsg.value += `${error.message}<br>`
-    }
-
-    xhr.upload.onprogress = (event) => {
-      if (ulploadItems.value[prop].status === 'cancelled' || ulploadItems.value[prop].status === 'failed') {
-        xhr.abort()
-      } else {
-        ulploadItems.value[prop].progress = (100 * event.loaded) / event.total
-      }
-    }
-    xhr.onload = () => {
-      console.log(xhr.response)
-
-      if (xhr.response.status === 'fail') {
-        if (xhr.response.errorCode == 'not-unique') ulploadItems.value[prop].status = 'duplicate'
-        else ulploadItems.value[prop].status = 'failed'
-
-        xhr.abort()
-      } else {
-        ulploadItems.value[prop].status = 'complete'
-      }
-    }
-
-    xhr.send(formData)
+    media.value.unshift({ name: 'spinner.gif', path: '', folder: selectedFolder.value, mimetype: 'image' })
   }
+
+  // for (const prop in Array.from(files)) {
+  //   ulploadItems.value[prop] = {}
+  //   ulploadItems.value[prop].name = files[prop].name
+  //   ulploadItems.value[prop].mimetype = files[prop].type
+  //   ulploadItems.value[prop].size = files[prop].size
+  //   ulploadItems.value[prop].status = 'uploading'
+  //   ulploadItems.value[prop].progress = 0
+  //   const xhr = new XMLHttpRequest()
+  //   xhr.open('POST', `${config.API_URL}/media`, true)
+  //   xhr.responseType = 'json'
+
+  //   const formData = new FormData()
+  //   formData.append('file', files[prop], files[prop].name)
+  //   formData.append('folder', selectedFolder.value._id)
+
+  //   xhr.onerror = (error) => {
+  //     errorMsg.value += `${error.message}<br>`
+  //   }
+
+  //   xhr.upload.onprogress = (event) => {
+  //     if (ulploadItems.value[prop].status === 'cancelled' || ulploadItems.value[prop].status === 'failed') {
+  //       xhr.abort()
+  //     } else {
+  //       ulploadItems.value[prop].progress = (100 * event.loaded) / event.total
+  //     }
+  //   }
+  //   xhr.onload = () => {
+  //     console.log(xhr.response)
+
+  //     if (xhr.response.status === 'fail') {
+  //       if (xhr.response.errorCode == 'not-unique') ulploadItems.value[prop].status = 'duplicate'
+  //       else ulploadItems.value[prop].status = 'failed'
+
+  //       xhr.abort()
+  //     } else {
+  //       ulploadItems.value[prop].status = 'complete'
+  //     }
+  //   }
+
+  //   xhr.send(formData)
+  // }
 }
 
 const setPage = async (currentPage) => {
@@ -197,13 +202,14 @@ const handleSelectFolder = async (folder) => {
 
 //save folder
 const handleFolderSaved = async (folder) => {
-  const index = folders.value.findIndex((f) => f._id == folder._id)
+  const index = folders.value.findIndex((f) => f.id == folder.id)
   if (index !== -1) folders.value.splice(index, 1, folder)
   else folders.value.push(folder)
 }
 
 // Toggle folder sort
 const toggleFolderSort = async (event) => {
+  console.log('EE', event)
   folderSort.field = event.field
   folderSort.order = event.order
   await fetchFolders()
@@ -295,38 +301,48 @@ const handleCloseUploadModal = async () => {
   showModal.value = false
 }
 
-const showDeleteFolderAlert = async () => {
-  showAlert(
-    'Are you sure you want to delete this folder?',
-    'If your folder conatains files, you will have to move or delete those files first.',
-    'deleteFolder',
-    true
-  )
-}
+// const showDeleteFolderAlert = async () => {
+//   showAlert(
+//     'Are you sure you want to delete this folder?',
+//     'If your folder conatains files, you will have to move or delete those files first.',
+//     'deleteFolder',
+//     true
+//   )
+// }
 
 const deleteFolder = async () => {
-  errorMsg.value = ''
-  alert.value.show = false
-  if (media.value.filter((m) => m.folder == selectedFolder.value._id).length) {
+  // errorMsg.value = ''
+  // alert.value.show = false
+  if (
+    !confirm(
+      'Are you sure you want to delete this folder?  If your folder contains files, you will have to move or delete those files first.'
+    )
+  )
+    return
+  if (media.value.filter((m) => m.folder == selectedFolder.value.id).length)
     return (
       (errorMsg.value =
         'You cannot delete non-empty folders.  Please delete or move all media to another folder before deleting folders.'),
       'Error'
     )
-  }
-  try {
-    const { data, pending, error } = await useFetch(`${config.API_URL}/media/folders/${selectedFolder.value._id}`, {
-      method: 'DELETE',
-    })
-    if (error.value) throw error.value
-    console.log(data.value)
-    const index = folders.value.findIndex((f) => f._id == selectedFolder.value._id)
-    if (index !== -1) folders.value.splice(index, 1)
-    selectedFolder.value = {}
-    message.value = `Folder ${selectedFolder.value.name} deleted succesfully`
-  } catch (err) {
-    console.log(err)
-  }
+  const response = await deleteDoc('media/folders', selectedFolder.value.id)
+  if (!response) return (errorMsg.value = `We were not able to delete folder ${selectedFolder.value.name} deleted`)
+  fetchFolders()
+  message.value = `Folder ${selectedFolder.value.name} deleted succesfully`
+
+  // try {
+  //   const { data, pending, error } = await useFetch(`${config.API_URL}/media/folders/${selectedFolder.value._id}`, {
+  //     method: 'DELETE',
+  //   })
+  //   if (error.value) throw error.value
+  //   console.log(data.value)
+  //   const index = folders.value.findIndex((f) => f._id == selectedFolder.value._id)
+  //   if (index !== -1) folders.value.splice(index, 1)
+  //   selectedFolder.value = {}
+  //   message.value = `Folder ${selectedFolder.value.name} deleted succesfully`
+  // } catch (err) {
+  //   console.log(err)
+  // }
 }
 
 const showAlert = (heading, paragraph, action, showCancelBtn) => {
@@ -337,15 +353,15 @@ const showAlert = (heading, paragraph, action, showCancelBtn) => {
   alert.value.show = true
 }
 
-watch(
-  () => alert.value.show,
-  (currentVal) => {
-    if (currentVal === 'ok' && alert.value.action === 'deleteMedia') deleteMedia()
-    if (currentVal === 'ok' && alert.value.action === 'deleteFolder') deleteFolder()
-  }
-)
-await fetchAllFolders()
-await fetchAllMedia()
+// watch(
+//   () => alert.value.show,
+//   (currentVal) => {
+//     if (currentVal === 'ok' && alert.value.action === 'deleteMedia') deleteMedia()
+//     if (currentVal === 'ok' && alert.value.action === 'deleteFolder') deleteFolder()
+//   }
+// )
+await fetchFolders()
+await fetchMedia()
 </script>
 
 <template>
@@ -362,20 +378,20 @@ await fetchAllMedia()
             :sortOptions="folderSortOptions"
             @toggleSort="toggleFolderSort"
             @folderSaved="handleFolderSaved"
-            @deleteFolder="showDeleteFolderAlert"
+            @deleteFolder="deleteFolder"
           />
         </div>
         <div class="forlder__list">
-          <!-- <MediaFolderList
+          <MediaFolderList
             v-if="folders.length"
             :folders="folders"
             :selectedFolder="selectedFolder"
             @folderSelected="handleSelectFolder"
-          /> -->
+          />
         </div>
       </div>
       <div class="file-actions">
-        <!-- <MediaFileActions
+        <MediaFileActions
           :folders="folders"
           :selectedMedia="selectedMedia"
           :selectedFolder="selectedFolder"
@@ -386,15 +402,15 @@ await fetchAllMedia()
           @moveMediaToFolder="handleMoveMediaToFolder"
           @deleteMediaBtnClicked="showMediaDeleteAlert"
           @searchKeywordSelected="handleSearch"
-        /> -->
-        <!-- <transition name="dropZone">
+        />
+        <transition name="dropZone">
           <MediaDropZone
             v-show="showDropZone"
             :selectedFolder="selectedFolder"
             @fileUploadBtnClicked="handleFileUploadBtnClicked"
             @uploadItemsSelected="handleUplodMedia"
           />
-        </transition> -->
+        </transition>
       </div>
     </div>
 
@@ -410,7 +426,7 @@ await fetchAllMedia()
         <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1" />
       </div>
     </div>
-    <div v-if="showModal">
+    <!-- <div v-if="showModal">
       <Modal @closeModal="showModal = false">
         <template #header>
           <h3 class="modal-header">File Upload Progress</h3>
@@ -449,7 +465,7 @@ await fetchAllMedia()
           </div>
         </template>
       </Modal>
-    </div>
+    </div> -->
     <div class="actions bg-slate-300 py-2 px-4 flex-row gap-2 justify-end" v-if="route.name !== 'media'">
       <button class="btn btn__secondary cancel px-2 py-1" @click="$emit('mediaSelectCancel')">Cancel</button>
       <button class="btn btn__primary px-2 py-1" @click="setSelectedMedia">Select</button>

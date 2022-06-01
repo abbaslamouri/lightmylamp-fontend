@@ -29,6 +29,9 @@ const emit = defineEmits([
   'deleteMediaBtnClicked',
 ])
 
+const mediaToDisplay = ref('all')
+const datesToDisplay = ref('all')
+
 // const keyword = ref(null)
 const moveToFolderId = ref('')
 const showMediaMoveAlert = ref(false)
@@ -72,7 +75,32 @@ const handleMoveMedia = async () => {
         </button>
       </div>
     </div>
-    <div class="px-2 py-1">
+    <div class="flex-row items-center justify-between px-2 py-1">
+      <div class="px-2 py-1 flex-row items-center gap-2">
+        <IconsListBulleted class="" />
+        <IconsListTiled class="" />
+        <div class="w-16">
+          <FormsBaseSelect
+            label="Media Type"
+            v-model="mediaToDisplay"
+            :options="[
+              { key: 'all', name: 'All Media Items' },
+              { key: 'images', name: 'Images' },
+            ]"
+          />
+        </div>
+        <div class="w-16">
+          <FormsBaseSelect
+            label="Dates"
+            v-model="datesToDisplay"
+            :options="[
+              { key: 'all', name: 'All Dates' },
+              { key: 'september 2022', name: 'September 2022' },
+            ]"
+          />
+        </div>
+        <button class="btn bg-slate-200 px-2 py-1">Bulk Select</button>
+      </div>
       <Search @searchKeywordSelected="$emit('searchKeywordSelected', $event)" />
     </div>
   </div>

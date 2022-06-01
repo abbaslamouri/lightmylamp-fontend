@@ -122,14 +122,14 @@ const useHttp = () => {
     } catch (err) {
       console.log('MYERROR', err)
       errorMsg.value = err
-      return {}
+      return false
     }
   }
 
   const deleteDoc = async (resource, id) => {
-    errorMsg.value = null
-    message.value = null
-    let response = null
+    errorMsg.value = ''
+    message.value = ''
+    let response
     // const token =
     //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
     //     ? useCookie('auth').value.token
@@ -150,6 +150,7 @@ const useHttp = () => {
     } catch (err) {
       console.log('MYERROR', err)
       errorMsg.value = err
+      console.log(errorMsg.value)
       return false
     }
   }

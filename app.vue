@@ -19,3 +19,5 @@ const hideSnackbar = () => {
     </NuxtLayout>
   </div>
 </template>
+
+<style></style>

@@ -17,7 +17,7 @@ const config = useRuntimeConfig()
     <img
       v-if="file.mimetype && file.mimetype.includes('image')"
       class="w-full h-full contain"
-      :src="`${config.backendUrl}/${file.path}/${file.name}`"
+      :src="`${config.backendUrl}/${file.path}${file.name}`"
     />
     <IconsPdf v-else-if="file.mimetype && file.mimetype.includes('pdf')" class="w-full h-full" />
     <div class="tooltip absolute top--05 left-50-per p-1 br-3 text-xs">{{ file.name }}</div>

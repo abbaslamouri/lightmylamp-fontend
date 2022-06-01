@@ -24,6 +24,7 @@ const handleItemsSelected = (event) => {
     @dragleave.prevent="dragged = false"
     @drop.prevent="handleItemsDropped"
   >
+    Drop files to upload here
     <IconsBackupFill />
     <a class="link text-lg font-bold" href="#" @click="fileRef.click()">Or click here to choose your files</a>
     <form enctype="multipart/form-data">
