@@ -153,8 +153,11 @@ const deleteAllTerms = (payload) => {
         <div class="flex-1 p-2 flex-col gap-2">
           <div class="flex-row items-center justify-between bg-white p-2 br-3 shadow-md">
             <h2>Attributes</h2>
-            <div class="flex-row gap-2">
-              <button class="btn btn__primary py-05 px-2 text-xs" @click.prevent="insertAttribute()">
+            <div class="flex-row gap-2" v-if="!product.attributes.length">
+              <button
+                class="btn btn__primary py-05 px-2 text-xs"
+                @click.prevent="insertAttribute()"
+              >
                 Add Attribute
               </button>
               <button
@@ -166,7 +169,6 @@ const deleteAllTerms = (payload) => {
               </button>
               <button
                 class="btn btn__secondary py-05 px-2 text-xs"
-                v-if="product.attributes.length"
                 @click.prevent="deleteAllAttributes"
               >
                 deleted All Attributes

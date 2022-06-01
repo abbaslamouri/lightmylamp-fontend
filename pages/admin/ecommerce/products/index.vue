@@ -103,8 +103,13 @@ await fetchAllProducts()
       <main class="flex-1 max-width-130 w-full flex-col gap-3">
         <div class="flex-col gap-3 flex-col br-5">
           <div class="flex-row gap-3" v-if="totalCount">
-            <Search class="flex-1" @searchKeywordSelected="handleSearch" />
-            <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="toggleSort" />
+            <Search class="flex-1" @searchKeywordSelected="handleSearch" v-if="totalCount && products.length > 1" />
+            <Sort
+              :sort="sort"
+              :sortOptions="sortOptions"
+              @toggleSort="toggleSort"
+              v-if="totalCount && products.length > 1"
+            />
           </div>
           <EcommerceAdminProductsList :products="products" :totalCount="totalCount" @deleteProduct="deleteProduct" />
         </div>

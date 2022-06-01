@@ -85,6 +85,9 @@ const setPage = async (currentPage) => {
 
 const addNewAttribute = () => {
   attributes.value.push({ name: '', sortOrder: 0, terms: [] })
+  count.value = 1
+  totalCount.value = 1
+  console.log(attributes.value)
 }
 
 const deleteAttribute = async (attributeId) => {
@@ -133,7 +136,6 @@ await fetchAllAttributes()
     <Title>{{ title }}</Title>
     <div class="flex-row items-center justify-between w-full max-w-130">
       <h3>Attributes</h3>
-      {{ page }}
       <button class="btn btn__primary btn__pill px-2 py-05 flex-row" @click="addNewAttribute">
         <IconsPlus class="w-2 h-2" />
         Add New
@@ -142,8 +144,8 @@ await fetchAllAttributes()
     <div class="flex-1 max-w-130 w-full flex-col gap-3">
       <div class="flex-col gap-2 br-5" v-if="totalCount">
         <div class="flex-row items-center gap-3">
-          <Search class="flex-1" @searchKeywordSelected="handleSearch" />
-          <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="toggleSort" />
+          <Search class="flex-1" @searchKeywordSelected="handleSearch" v-if="attributes.length > 1" />
+          <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="toggleSort" v-if="attributes.length > 1" />
         </div>
         <table class="shadow-md border border-slate-300">
           <thead class="bg-slate-300">
@@ -173,14 +175,11 @@ await fetchAllAttributes()
       <EcommerceAdminEmptyMsg v-else>
         <template #header>Add attributes</template>
         <template #default>
-          <div class="">Create attrubutes and attribute terms</div>
-          <NuxtLink
-            class="btn btn__primary btn__pill px-3 py-05 text-xs items-self-end"
-            :to="{ name: 'admin-ecommerce-categories-slug', params: { slug: '_' } }"
-          >
+          <div class="">Create attributes and attribute terms</div>
+          <button class="btn btn__primary btn__pill px-2 py-05 flex-row items-self-end" @click="addNewAttribute">
             <IconsPlus class="w-2 h-2" />
-            <span>Add</span>
-          </NuxtLink>
+            Add New
+          </button>
         </template>
       </EcommerceAdminEmptyMsg>
     </div>

@@ -43,13 +43,13 @@ const addAttributeTerm = async () => {
 </script>
 
 <template>
-  <tr class="admin-attribute row">
-    <td class="max-w-6">
+  <tr>
+    <td class="w-6">
       <div class="base-input">
-        <input type="text" required v-model="newAttribute.sortOrder" @keyup.enter="addAttribute" />
+        <input class="w-full p-1" type="text" required v-model="newAttribute.sortOrder" @keyup.enter="addAttribute" />
       </div>
     </td>
-    <td class="max-w-10">
+    <td class="w-20">
       <div class="base-input">
         <input type="text" ref="attributeInputRef" required v-model="newAttribute.name" @keyup.enter="addAttribute" />
       </div>
@@ -79,7 +79,7 @@ const addAttributeTerm = async () => {
         </div>
       </div>
     </td>
-    <td class="minw-12">
+    <td class="w-12">
       <EcommerceAdminRowActions
         :showAction="showAction"
         @moreHoriz="$emit('setActions', { index: index, action: !showAction })"
@@ -95,6 +95,6 @@ const addAttributeTerm = async () => {
 
 td {
   border-bottom: 1px solid $stone-300;
-  padding: 2rem;
+  padding: 0.5rem;
 }
 </style>

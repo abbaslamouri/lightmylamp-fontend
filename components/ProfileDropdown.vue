@@ -20,7 +20,7 @@ const signout = async () => {
 <template>
   <div class="profile-dropdown relative">
     <div
-      class="header flex-row items-center gap1 text-xs border border-slate-50 py05 px1 cursor-pointer br3 relative z-99"
+      class="header flex-row items-center gap-1 text-xs border border-slate-50 py-05 px-1 cursor-pointer br-3 relative z-99"
       v-bind:class="{ selected: showProfileDropdown }"
     >
       <IconsPersonFill class="fill-slate-50" />
@@ -28,7 +28,7 @@ const signout = async () => {
     </div>
     <div
       v-if="showProfileDropdown"
-      class="menu absolute flex-col gap2 p2 bg-slate-50 z-99 text-slate-800 w-full text-xs"
+      class="menu absolute flex-col gap-2 p-2 bg-slate-50 z-99 text-slate-800 w-full text-xs"
     >
       <h3 class="">My Accoun</h3>
       <ul>
@@ -45,7 +45,7 @@ const signout = async () => {
           <NuxtLink :to="{ name: `admin` }">Addresses?</NuxtLink>
         </li>
       </ul>
-      <button class="btn btn__secondary py05 px1" @click="signout">Sign out</button>
+      <button class="btn btn__secondary py-05 px1" @click="signout">Sign out</button>
     </div>
     <div class="overlay" v-if="showProfileDropdown" @click="showProfileDropdown = !showProfileDropdown"></div>
   </div>

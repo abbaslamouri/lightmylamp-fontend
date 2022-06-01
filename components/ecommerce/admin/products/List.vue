@@ -41,8 +41,8 @@ const deleteProduct = (productId) => {
   <table class="text-xs shadow-md">
     <thead>
       <tr class="bg-slate-200">
-        <th>Image</th>
-        <th>Product</th>
+        <th class="w-6">Image</th>
+        <th>Name</th>
         <th>Price</th>
         <th>Sale Price</th>
         <th>Stock Qty.</th>
@@ -53,23 +53,23 @@ const deleteProduct = (productId) => {
     </thead>
     <tbody>
       <tr v-for="(product, index) in products" :key="product._id">
-        <td class="flex-row justify-center">
-          <div class="w-5 h-5">
+        <td class="w-10 flex-row justify-center items-center">
+          <div class="w-8 h-8 justify-center items-center">
             <img
-              class="w-full hfull contain"
-              v-if="product.gallery.length && product.gallery[0] && product.gallery[0].mimetype.includes('image')"
-              :src="`${config.backendUrl}/${product.gallery[0].path}/${product.gallery[0].name}`"
+              class="w-full h-full cover"
+              v-if="product.gallery.length && product.gallery[1] && product.gallery[1].mimetype.includes('image')"
+              :src="`${config.backendUrl}/${product.gallery[1].path}/${product.gallery[1].name}`"
             />
             <img v-else class="w-full hfull contain" :src="`/placeholder.png`" />
           </div>
         </td>
-        <td>{{ product.name }}</td>
-        <td class=" ">{{ product.price }}</td>
-        <td class=" ">{{ product.salePrice }}</td>
-        <td class=" ">{{ product.stockQty }}</td>
-        <td class=" ">{{ product.orders }}</td>
-        <td class=" ">{{ product.sales }}</td>
-        <td class="minw12">
+        <td class="text-center font-bold">{{ product.name }}</td>
+        <td class="w-12 text-center">{{ product.price }}</td>
+        <td class="w-12 text-center">{{ product.salePrice }}</td>
+        <td class="w-12 text-center">{{ product.stockQty }}</td>
+        <td class="w-12 text-center">{{ product.orders }}</td>
+        <td class="w-12 text-center">{{ product.sales }}</td>
+        <td class="w-12">
           <EcommerceAdminRowActions
             :showAction="showActionKeys[index]"
             :showEdit="true"
@@ -84,4 +84,18 @@ const deleteProduct = (productId) => {
   </table>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import '@/assets/scss/variables';
+
+tr {
+  border-bottom: 1px solid $slate-300;
+}
+th {
+  padding: 2rem;
+}
+td {
+  padding: 1rem;
+
+  // border: 1px solid red;
+}
+</style>

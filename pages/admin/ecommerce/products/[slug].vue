@@ -14,7 +14,7 @@ const router = useRouter()
 const showAttributesSlideout = ref(false)
 const showVariantsSlideout = ref(false)
 const showDropZone = ref(false)
-const galleryIntro = 'This image gallery contains all images associated with this product including its variants.'
+const galleryIntro = 'This image gallery contains all images associated with this product.'
 let response = null
 const product = useState('product', () => {
   return { productType: 'variable', gallery: [], categories: [], attributes: [], variants: [] }
@@ -41,6 +41,7 @@ const addImagesToGallery = async (gallery) => {
   for (const prop in response.media) {
     product.value.gallery.push(response.media[prop])
   }
+  saveProduct()
 }
 
 const saveProduct = async () => {

@@ -1,7 +1,7 @@
 <script setup>
 const navLinks = ref([
   { name: 'admin', title: 'Dashboard', icon: 'IconsHome', subMenu: [], open: false },
-  // { name: 'admin-media', title: 'Media', icon: 'IconsFolderFill', subMenu: [], open: false },
+  { name: 'admin-media', title: 'Media', icon: 'IconsFolderFill', subMenu: [], open: false },
   {
     name: 'admin-ecommerce-categories',
     title: 'Ecommerce',

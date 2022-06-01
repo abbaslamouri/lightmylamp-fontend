@@ -113,29 +113,13 @@ const setFeaturedImage = (event) => {
         @mouseenter="mouseEnter($event, index)"
         @mouseleave="mouseLeave($event, index)"
       >
-        <div
-          class="thumb__draggable"
-          :class="{ first: index == 0 }"
-          :ref="(el) => (draggableElements[index] = el)"
-          draggable="true"
-          @dragstart="handleDragstart($event, index)"
-          @dragend="handleDragend($event, index)"
-        >
-          <img
-            class="w-full hfull contain"
-            :src="`${config.backendUrl}/${image.path}/${image.name}`"
-            :alt="`${image.name} Photo`"
-            draggable="false"
-          />
-        </div>
-        <span class="thumb__delete" @click.prevent="$emit('removeGalleryImage', index)"><IconsDeleteFill /></span>
         <div class="thumb__move"><IconsMove /></div>
-        <div class="thumb__index">{{ index + 1 }}</div>
+        <div class="thumb__index flex-row items-center justify-center">{{ index + 1 }}</div>
         <div class="thumb__imageTitle" v-if="index === 0">
-          <span>Thumbnail</span>
+          <span>Featured</span>
         </div>
         <div class="thumb__imageTitle" v-if="index === 1">
-          <span>Featured</span>
+          <span>Thumbnail</span>
         </div>
         <div class="thumb__imageTitle" v-if="index === 2">
           <span>Body</span>
@@ -146,6 +130,22 @@ const setFeaturedImage = (event) => {
         <div class="thumb__imageTitle" v-if="index === 4">
           <span>Recipe</span>
         </div>
+        <div
+          class="thumb__draggable"
+          :class="{ first: index == 0 }"
+          :ref="(el) => (draggableElements[index] = el)"
+          draggable="true"
+          @dragstart="handleDragstart($event, index)"
+          @dragend="handleDragend($event, index)"
+        >
+          <img
+            class=""
+            :src="`${config.backendUrl}/${image.path}/${image.name}`"
+            :alt="`${image.name} Photo`"
+            draggable="false"
+          />
+        </div>
+        <span class="thumb__delete" @click.prevent="$emit('removeGalleryImage', index)"><IconsDeleteFill /></span>
       </div>
     </div>
   </section>
@@ -161,65 +161,112 @@ const setFeaturedImage = (event) => {
   padding: 2rem;
   border: 1px solid $slate-200;
   border-radius: 5px;
+  // align-items: center;
+
+  @media only screen and (max-width: 1200px) {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+
+  @media only screen and (max-width: 1000px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 
   .thumb {
+    position: relative;
     grid-column: span 4 / span 4;
     grid-row: span 4 / span 4;
-    display: grid;
-    grid-template-rows: repeat(4, 1fr);
-    grid-template-columns: repeat(4, 1fr);
-    &.product {
-      &:nth-of-type(1){
-        grid-column: span 8 / span 8;
-        grid-row: span 8 / span 8;
+    display: flex;
+    // grid-template-rows: repeat(4, 1fr);
+    // grid-template-columns: repeat(4, 1fr);
+    // &.product {
+
+    @media only screen and (max-width: 1200px) {
+      grid-column: span 3 / span 3;
+      grid-row: span 3 / span 3;
+    }
+
+    @media only screen and (max-width: 1000px) {
+      grid-column: span 2 / span 2;
+      grid-row: span 2 / span 2;
+    }
+
+    &:nth-of-type(1) {
+      grid-column: span 8 / span 8;
+      grid-row: span 8 / span 8;
+
+      @media only screen and (max-width: 1200px) {
+        grid-column: span 9 / span 9;
+        grid-row: span 9 / span 9;
       }
-      &:nth-of-type(2),
-      &:nth-of-type(3),
-      &:nth-of-type(4),
-      &:nth-of-type(5) {
+
+      @media only screen and (max-width: 1000px) {
         grid-column: span 4 / span 4;
         grid-row: span 4 / span 4;
       }
     }
+    // &:nth-of-type(2),
+    // &:nth-of-type(3),
+    // &:nth-of-type(4),
+    // &:nth-of-type(5) {
+    //   grid-column: span 4 / span 4;
+    //   grid-row: span 4 / span 4;
+    // }
+    // }
+    // border: 1px solid red;
 
     img {
+      display: inline-block;
+      // grid-column: 1 / 5;
+      // grid-row: 1 / 5;
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      // border: 1px solid red;
+      object-fit: cover;
     }
 
     // border: 1px solid red;
 
     &__index {
-      grid-column: 1 / 2;
-      grid-row: 1 / 2;
-      transform: translate(-100%, -100%);
+      position: absolute;
+      top: 0;
+      left: 0;
+      // grid-column: 1 / 2;
+      // grid-row: 1 / 2;
+      transform: translate(-50%, -50%);
       background-color: $slate-600;
       width: 1.8rem;
       height: 1.8rem;
       color: $slate-50;
       border-radius: 50%;
       font-size: x-small;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      // display: flex;
+      // justify-content: center;
+      // align-items: center;
     }
 
     &__draggable {
-      grid-column: 1 / 4;
-      grid-row: 1 / 4;
+      // z-index: 9999;
+
+      // position: absolute;
+      // grid-column: 1 / 4;
+      // grid-row: 1 / 4;
     }
 
     &__delete {
-      grid-column: 3 / 4;
-      grid-row: 1 / 2;
+      position: absolute;
+      top: 0;
+      right: 0;
+      transform: translate(25%, -25%);
+
+      // grid-column: 3 / 4;
+      // grid-row: 1 / 2;
       top: 1rem;
       right: 1rem;
       opacity: 0;
       visibility: hidden;
-      display: flex;
-      justify-content: flex-end;
-      align-items: flex-start;
+      // display: flex;
+      // justify-content: flex-end;
+      // align-items: flex-start;
 
       svg {
         fill: $slate-50;
@@ -227,25 +274,34 @@ const setFeaturedImage = (event) => {
     }
 
     &__move {
-      grid-column: 2 / 3;
-      grid-row: 2 / 3;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      // grid-column: 2 / 3;
+      // grid-row: 2 / 3;
       opacity: 0;
       visibility: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      // display: flex;
+      // justify-content: center;
+      // align-items: center;
       svg {
         fill: $slate-50;
       }
     }
 
     &__imageTitle {
-      grid-column: 1 / 4;
-      grid-row: 1 / 2;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      transform: translateY(-30%);
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      // grid-column: 1 / 4;
+      // grid-row: 1 / 2;
+      // display: flex;
+      // align-items: flex-start;
+      // justify-content: center;
+      // transform: translateY(-30%);
 
       span {
         background-color: $slate-600;

@@ -1,11 +1,11 @@
 <script setup>
 const { isAuthenticated, user } = useAuth()
-const showAdminSidebar = ref(true)
+const showAdminSidebar = ref(false)
 
 const checkScreen = () => {
   if (process.client) {
-    if (window.innerWidth < 768) showAdminSidebar.value = false
-    if (window.innerWidth >= 768) showAdminSidebar.value = true
+    if (window.innerWidth < 1400) showAdminSidebar.value = false
+    if (window.innerWidth >= 1400) showAdminSidebar.value = true
   }
 }
 

@@ -1,5 +1,4 @@
 <script setup>
-
 const props = defineProps({
   index: {
     type: Number,
@@ -36,7 +35,7 @@ const cancelSelectedImages = () => {
 </script>
 
 <template>
-  <div class="variant-select-existing">
+  <div>
     <div class="overlay"></div>
     <div class="wrapper fixed top-0 left-0 flex-col items-center justify-center w-full h-full z-9">
       <div class="content flex-col gap-2 max-w-75-percent br-5 bg-slate-50 py-4 px-6 shadow-md">
@@ -89,17 +88,21 @@ const cancelSelectedImages = () => {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 
   .thumb {
+    display: flex;
     &.selected {
       border: 1px solid $green-600;
 
       .check {
         background-color: $green-600;
+        padding: 0.25rem;
+        transform: translate(-50%, -50%);
       }
     }
 
-    .check {
-      padding: 0.25rem;
-      transform: translate(-50%, -50%);
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
   }
 }
