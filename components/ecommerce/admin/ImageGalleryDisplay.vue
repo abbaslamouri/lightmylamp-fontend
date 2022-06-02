@@ -140,8 +140,8 @@ const setFeaturedImage = (event) => {
         >
           <img
             class=""
-            :src="`${config.backendUrl}/${image.path}/${image.name}`"
-            :alt="`${image.name} Photo`"
+            :src="`${config.backendUrl}/${image.path}`"
+            :alt="`${image.originalName} Photo`"
             draggable="false"
           />
         </div>

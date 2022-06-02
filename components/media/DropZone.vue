@@ -1,5 +1,5 @@
 <script setup>
-const emit = defineEmits(['uploadItemsSelected', 'fileUploadBtnClicked'])
+const emit = defineEmits(['uploadItemsSelected', 'cancelFileUpload'])
 
 const fileRef = ref(null)
 const dragged = ref(false)
@@ -38,7 +38,7 @@ const handleItemsSelected = (event) => {
         @change="handleItemsSelected"
       />
     </form>
-    <button class="btn btn__secondary py-05 px-2" @click="$emit('fileUploadBtnClicked')">
+    <button class="btn btn__secondary py-05 px-2" @click="$emit('cancelFileUpload')">
       <span>Cancel</span>
     </button>
   </div>

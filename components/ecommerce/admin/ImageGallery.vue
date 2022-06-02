@@ -7,14 +7,20 @@ const props = defineProps({
   galleryIntro: String,
   galleryType: String,
 })
-const emit = defineEmits(['setGalleryImage', 'mediaSelected', 'removeGalleryImage', 'selectFromProductGallery'])
+const emit = defineEmits(['setGalleryImage', 'removeGalleryImage', 'selectFromProductGallery'])
 
-const showDropZone = ref(false)
+const { errorMsg, message, showMediaSelector, mediaReference, galleryMedia } = useAppState()
 
-const emitMediaSelected = (event) => {
-  showDropZone.value = false
-  emit('mediaSelected', event)
+// const showDropZone = ref(false)
+const showMediaUploader = () => {
+  mediaReference.value = 'productMedia'
+  showMediaSelector.value = true
 }
+
+// const emitMediaSelected = (event) => {
+//   showDropZone.value = false
+//   emit('mediaSelected', event)
+// }
 </script>
 
 <template>
@@ -37,7 +43,7 @@ const emitMediaSelected = (event) => {
       />
       <div class="w-full flex-col items-center gap-2">
         <div class="flex-row gap-2">
-          <button class="btn btn__image-select" @click.prevent="showDropZone = true">
+          <button class="btn btn__image-select" @click.prevent="showMediaUploader">
             <IconsImage />
             <span> Select New Images </span>
           </button>
@@ -50,12 +56,12 @@ const emitMediaSelected = (event) => {
             <span> Select From Product Images </span>
           </button>
         </div>
-        <EcommerceDropZone
+        <!-- <EcommerceDropZone
           v-if="showDropZone"
           class="w-full"
           @hideDropZone="showDropZone = false"
           @mediaSelected="emitMediaSelected"
-        />
+        /> -->
       </div>
       <p class="text-sm">PNG, JPG, and GIF Accepted</p>
     </div>

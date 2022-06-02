@@ -5,7 +5,7 @@ definePageMeta({
 const pageTitle = ref('Product | YRL')
 
 const config = useRuntimeConfig()
-const { errorMsg, message } = useAppState()
+const { errorMsg, message, galleryMedia, mediaReference, showMediaSelector } = useAppState()
 const { fetchAll, saveMedia, saveDoc, deleteDocs } = useHttp()
 const route = useRoute()
 const router = useRouter()
@@ -29,19 +29,27 @@ if (slug) {
     if (response.docs) product.value.variants = response.docs
   }
 }
-const addImagesToGallery = async (gallery) => {
-  if (!gallery.length) return
-  const formData = new FormData()
-  for (const prop in gallery) {
-    formData.append('gallery', gallery[prop])
+const addImagesToGallery = async (media) => {
+  console.log(media)
+  for (const prop in media) {
+    const index = product.value.gallery.findIndex((m) => m.id == media[prop].id)
+    if (index === -1) {
+      product.value.gallery.push(media[prop])
+    }
   }
-  response = await saveMedia(formData)
-  console.log(response)
-  if (!Object.values(response).length) return
-  for (const prop in response.media) {
-    product.value.gallery.push(response.media[prop])
-  }
-  saveProduct()
+  console.log(product.value)
+  // if (!gallery.length) return
+  // const formData = new FormData()
+  // for (const prop in gallery) {
+  //   formData.append('gallery', gallery[prop])
+  // }
+  // response = await saveMedia(formData)
+  // console.log(response)
+  // if (!Object.values(response).length) return
+  // for (const prop in response.media) {
+  //   product.value.gallery.push(response.media[prop])
+  // }
+  // saveProduct()
 }
 
 const saveProduct = async () => {
@@ -80,14 +88,14 @@ const saveProduct = async () => {
 //   // console.log(product.value.gallery)
 // }
 
-// watch(
-//   () => galleryMedia.value,
-//   (currentVal) => {
-//     console.log(currentVal)
-//     if (mediaReference.value === 'productMedia') addImagesToGallery(currentVal)
-//   },
-//   { deep: true }
-// )
+watch(
+  () => galleryMedia.value,
+  (currentVal) => {
+    console.log(currentVal)
+    if (mediaReference.value === 'productMedia') addImagesToGallery(currentVal)
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -122,7 +130,6 @@ const saveProduct = async () => {
             :galleryIntro="galleryIntro"
             @removeGalleryImage="product.gallery.splice($event, 1)"
             @setGalleryImage="product.gallery[$event.index] = $event.value"
-            @mediaSelected="addImagesToGallery"
           />
         </section>
         <EcommerceAdminProductAttributesContent

@@ -22,7 +22,7 @@ const config = useRuntimeConfig()
     <div v-else>
       <IconsPdf v-if="file.mimetype && file.mimetype.includes('pdf')" class="w-full h-full" />
     </div>
-    <div class="tooltip absolute top--05 left-50-per p-1 br-3 text-xs">{{ file.name }}</div>
+    <div class="tooltip absolute top--05 left-50-per p-1 br-3 text-xs">{{ file.originalName }}</div>
   </div>
 </template>
 

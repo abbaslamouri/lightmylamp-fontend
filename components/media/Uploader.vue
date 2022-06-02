@@ -1,8 +1,9 @@
 <script setup>
 const route = useRoute()
+console.log(route)
 const config = useRuntimeConfig()
-const { fetchAll, saveMedia, deleteDoc, deleteDocs } = useHttp()
-const { message, errorMsg } = useAppState()
+const { fetchAll, saveMedia, saveDoc, deleteDoc, deleteDocs } = useHttp()
+const { message, errorMsg, showMediaSelector, galleryMedia } = useAppState()
 const selectedMedia = ref([])
 const media = ref([])
 const count = ref(0)
@@ -11,7 +12,7 @@ const folders = ref([])
 const selectedFolder = ref({})
 // const folderToDelete = ref(null)
 const page = ref(1)
-const perPage = ref(13)
+const perPage = ref(7)
 // const folderSort. field('name')
 // const folderSortOrder = ref('')
 // const mediaSortField = ref('name')
@@ -21,7 +22,7 @@ const showDropZone = ref(false)
 // const showModal = ref(false)
 const ulploadItems = ref([])
 const folderFields = 'id, name, slug'
-const fields = 'id, name, slug, folder, path, mimetype'
+const fields = 'id, name, slug, originalName, folder, path, mimetype'
 let response = ''
 
 const folderSort = reactive({
@@ -57,7 +58,7 @@ const params = computed(() => {
     page: page.value,
     limit: perPage.value,
     sort: `${mediaSort.order}${mediaSort.field}`,
-    folder: Object.values(selectedFolder.value).length ? selectedFolder.value._id : null,
+    folder: Object.values(selectedFolder.value).length ? selectedFolder.value.id : null,
     keyword: keyword.value ? keyword.value : null,
   }
   if (!params.folder) delete params.folder
@@ -96,7 +97,9 @@ const fetchFolders = async () => {
 // }
 
 const fetchMedia = async () => {
+  selectedMedia.value = []
   response = await fetchAll('media', params.value)
+  console.log('Media', response)
   media.value = response.docs
   count.value = response.results
   totalCount.value = response.totalCount
@@ -128,8 +131,8 @@ const overallFileUploadProgress = computed(() => {
 // }
 
 // Handles upload button click
-const handleFileUploadBtnClicked = () => {
-  if (!selectedFolder.value._id) errorMsg.value = 'Please selecet a folder'
+const toggleDropZone = () => {
+  if (!selectedFolder.value.id) errorMsg.value = 'Please selecet a folder'
   else showDropZone.value = !showDropZone.value
 }
 
@@ -320,35 +323,32 @@ const deleteMedia = async () => {
 }
 
 // // Move media to a different folder
-const handleMoveMediaToFolder = async (folderId) => {
+const moveMediaToFolder = async (folderId) => {
   console.log('FOL', folderId)
   errorMsg.value = ''
-  const folder = folders.value.find((f) => f._id == folderId)
+  const folder = folders.value.find((f) => f.id == folderId)
   if (!folder) return
   await Promise.all(
     selectedMedia.value.map(async (item) => {
-      try {
-        const { data, pending, error } = await useFetch(`${config.API_URL}/media/${item._id}`, {
-          method: 'PATCH',
-          // params: { id: item._id },
-          body: { folder: folderId },
-        })
-        if (error.value) throw error.value
-        console.log(data.value)
-      } catch (err) {
-        console.log(err.data)
-      }
+      // try {
+      item.folder = folder
+      const response = await saveDoc(`media`, item)
+      // if (error.value) throw error.value
+      console.log(response)
+      // } catch (err) {
+      //   console.log(err.data)
+      // }
     })
   )
 
   selectedFolder.value = folder
-  selectedMedia.value = []
+  // selectedMedia.value = []
   await fetchMedia()
 }
 
-const showMediaDeleteAlert = async () => {
-  showAlert('Are you sure you want to delete these files?', '', 'deleteMedia', true)
-}
+// const showMediaDeleteAlert = async () => {
+//   showAlert('Are you sure you want to delete these files?', '', 'deleteMedia', true)
+// }
 
 const handleSearch = async (searchKeyword) => {
   page.value = 1
@@ -361,10 +361,10 @@ const setSelectedMedia = () => {
   showMediaSelector.value = false
 }
 
-const handleCloseUploadModal = async () => {
-  await fetchMedia()
-  showModal.value = false
-}
+// const handleCloseUploadModal = async () => {
+//   await fetchMedia()
+//   showModal.value = false
+// }
 
 // const showDeleteFolderAlert = async () => {
 //   showAlert(
@@ -410,13 +410,13 @@ const deleteFolder = async () => {
   // }
 }
 
-const showAlert = (heading, paragraph, action, showCancelBtn) => {
-  alert.value.heading = heading
-  alert.value.paragraph = paragraph
-  alert.value.action = action
-  alert.value.showCancelBtn = showCancelBtn
-  alert.value.show = true
-}
+// const showAlert = (heading, paragraph, action, showCancelBtn) => {
+//   alert.value.heading = heading
+//   alert.value.paragraph = paragraph
+//   alert.value.action = action
+//   alert.value.showCancelBtn = showCancelBtn
+//   alert.value.show = true
+// }
 
 // watch(
 //   () => alert.value.show,
@@ -463,8 +463,8 @@ await fetchMedia()
           :sort="mediaSort"
           :sortOptions="mediaSortOptions"
           @toggleSort="toggleMediaSort"
-          @fileUploadBtnClicked="handleFileUploadBtnClicked"
-          @moveMediaToFolder="handleMoveMediaToFolder"
+          @fileUploadBtnClicked="toggleDropZone"
+          @moveMediaToFolder="moveMediaToFolder"
           @deleteMedia="deleteMedia"
           @searchKeywordSelected="handleSearch"
         />
@@ -472,7 +472,7 @@ await fetchMedia()
           <MediaDropZone
             v-show="showDropZone"
             :selectedFolder="selectedFolder"
-            @fileUploadBtnClicked="handleFileUploadBtnClicked"
+            @cancelFileUpload="toggleDropZone"
             @uploadItemsSelected="handleUplodMedia"
           />
         </transition>
@@ -488,7 +488,7 @@ await fetchMedia()
         @removeFromSelectedMedia="removeFromSelectedMedia"
       />
       <div class="pagination">
-        <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1" />
+        <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" />
       </div>
     </div>
     <!-- <div v-if="showModal">
@@ -531,7 +531,7 @@ await fetchMedia()
         </template>
       </Modal>
     </div> -->
-    <div class="actions bg-slate-300 py-2 px-4 flex-row gap-2 justify-end" v-if="route.name !== 'media'">
+    <div class="actions bg-slate-300 py-2 px-4 flex-row gap-2 justify-end" v-if="route.name !== 'admin-media'">
       <button class="btn btn__secondary cancel px-2 py-1" @click="$emit('mediaSelectCancel')">Cancel</button>
       <button class="btn btn__primary px-2 py-1" @click="setSelectedMedia">Select</button>
     </div>

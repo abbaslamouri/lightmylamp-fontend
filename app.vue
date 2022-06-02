@@ -1,5 +1,5 @@
 <script setup>
-const { message, errorMsg } = useAppState()
+const { message, errorMsg, showMediaSelector } = useAppState()
 const hideSnackbar = () => {
   errorMsg.value = null
   message.value = null
@@ -16,6 +16,9 @@ const hideSnackbar = () => {
         duration="0"
         @hideSnackbar="hideSnackbar"
       />
+      <div class="media-selector" v-if="showMediaSelector">
+        <LazyMediaUploader @mediaSelectCancel="showMediaSelector = false" />
+      </div>
     </NuxtLayout>
   </div>
 </template>

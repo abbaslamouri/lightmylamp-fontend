@@ -38,7 +38,9 @@ const showMediaMoveAlert = ref(false)
 // const showMediaDeleteAlert = ref(false)
 
 const handleMoveMedia = async () => {
-  showMediaMoveAlert.value = false
+  if (!confirm('Are you sure you want to move these files')) return
+  console.log(moveToFolderId.value)
+  // showMediaMoveAlert.value = false
   emit('moveMediaToFolder', moveToFolderId.value)
   moveToFolderId.value = ''
 }
@@ -46,36 +48,36 @@ const handleMoveMedia = async () => {
 
 <template>
   <div class="bg-white shadow-md">
-    <div class="flex-row items-center justify-between gap-2 px-1 py-2 border-b-stone-300 text-xs">
+    <div class="flex-row items-center justify-between gap-2 px-2 py-2 border-b-stone-300 text-xs">
       <button class="btn btn__new-media gap-1 min-w-16" @click="$emit('fileUploadBtnClicked')">
         <IconsUpload />
         <span>Upload Files</span>
       </button>
-      <div class="">
+      <div class="flex-row gap-4">
         <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="$emit('toggleSort', $event)" />
-      </div>
-      <div class="flex-row items-center gap-2 min-w-60">
-        <div class="min-w-20" v-if="selectedMedia.length">
-          <FormsBaseSelect
-            v-model="moveToFolderId"
-            label="Move Selected To Folder"
-            :options="
-              folders
-                .filter((f) => f._id != selectedFolder._id)
-                .map((f) => {
-                  return { key: f._id, name: f.name }
-                })
-            "
-            nullOption="Select Folder"
-            @update:modelValue="handleMoveMedia"
-          />
+        <div class="flex-row items-center gap-2 min-w-60">
+          <div class="min-w-20" v-if="selectedMedia.length">
+            <FormsBaseSelect
+              v-model="moveToFolderId"
+              label="Move Selected To Folder"
+              :options="
+                folders
+                  .filter((f) => f.id != selectedFolder.id)
+                  .map((f) => {
+                    return { key: f._id, name: f.name }
+                  })
+              "
+              nullOption="Select Folder"
+              @update:modelValue="handleMoveMedia"
+            />
+          </div>
+          <button class="btn" v-if="selectedMedia.length" @click="$emit('deleteMedia')">
+            <IconsDeleteFill class="fill-red-600" />
+          </button>
         </div>
-        <button class="btn" v-if="selectedMedia.length" @click="$emit('deleteMedia')">
-          <IconsDeleteFill class="fill-red-600" />
-        </button>
       </div>
     </div>
-    <div class="flex-row items-center justify-between px-2 py-1">
+    <div class="flex-row items-center justify-between px-2">
       <div class="px-2 py-1 flex-row items-center gap-2">
         <IconsListBulleted class="" />
         <IconsListTiled class="" />
@@ -101,7 +103,7 @@ const handleMoveMedia = async () => {
         </div>
         <button class="btn bg-slate-200 px-2 py-1">Bulk Select</button>
       </div>
-      <Search @searchKeywordSelected="$emit('searchKeywordSelected', $event)" />
+      <Search class="" @searchKeywordSelected="$emit('searchKeywordSelected', $event)" />
     </div>
   </div>
 </template>
