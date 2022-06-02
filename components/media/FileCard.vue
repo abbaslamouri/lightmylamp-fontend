@@ -14,12 +14,14 @@ const config = useRuntimeConfig()
     @mouseenter="$event.target.classList.add('hovered')"
     @mouseleave="$event.target.classList.remove('hovered')"
   >
-    <img
-      v-if="file.mimetype && file.mimetype.includes('image')"
-      class="w-full h-full contain"
-      :src="`${config.backendUrl}/${file.path}${file.name}`"
-    />
-    <IconsPdf v-else-if="file.mimetype && file.mimetype.includes('pdf')" class="w-full h-full" />
+    <div v-if="file.mimetype.includes('image')">
+      <img v-if="file.name === 'spinner.gif'" class="w-full h-full contain" :src="`${config.backendUrl}/spinner.gif`" />
+      <img v-else-if="file.path" class="w-full h-full contain" :src="`${config.backendUrl}/${file.path}`" />
+      <img v-else class="w-full h-full contain" :src="`${config.backendUrl}/placeholder.png`" />
+    </div>
+    <div v-else>
+      <IconsPdf v-if="file.mimetype && file.mimetype.includes('pdf')" class="w-full h-full" />
+    </div>
     <div class="tooltip absolute top--05 left-50-per p-1 br-3 text-xs">{{ file.name }}</div>
   </div>
 </template>

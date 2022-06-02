@@ -185,6 +185,7 @@ const useHttp = () => {
   }
 
   const saveMedia = async (payload) => {
+    console.log('here')
     errorMsg.value = null
     message.value = null
     let response = null
@@ -208,7 +209,7 @@ const useHttp = () => {
     } catch (err) {
       console.log('MYERROR', err)
       errorMsg.value = err
-      return {}
+      return false
     }
   }
 

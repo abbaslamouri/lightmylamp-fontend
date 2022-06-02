@@ -26,7 +26,7 @@ const emit = defineEmits([
   'moveMediaToFolder',
   'deleteMedia',
   'searchKeywordSelected',
-  'deleteMediaBtnClicked',
+  'deleteMedia',
 ])
 
 const mediaToDisplay = ref('all')
@@ -70,7 +70,7 @@ const handleMoveMedia = async () => {
             @update:modelValue="handleMoveMedia"
           />
         </div>
-        <button class="btn" v-if="selectedMedia.length" @click="$emit('deleteMediaBtnClicked')">
+        <button class="btn" v-if="selectedMedia.length" @click="$emit('deleteMedia')">
           <IconsDeleteFill class="fill-red-600" />
         </button>
       </div>

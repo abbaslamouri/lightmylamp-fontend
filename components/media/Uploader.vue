@@ -1,7 +1,7 @@
 <script setup>
 const route = useRoute()
 const config = useRuntimeConfig()
-const { fetchAll, deleteDoc, deleteDocs } = useHttp()
+const { fetchAll, saveMedia, deleteDoc, deleteDocs } = useHttp()
 const { message, errorMsg } = useAppState()
 const selectedMedia = ref([])
 const media = ref([])
@@ -134,16 +134,83 @@ const handleFileUploadBtnClicked = () => {
 }
 
 // Handles meia upload
-const handleUplodMedia = async (files) => {
-  console.log(files)
-  // showModal.value = true
+const handleUplodMedia = async (gallery) => {
+  console.log(gallery)
+  console.log(selectedFolder.value)
   showDropZone.value = false
-  errorMsg.value = ''
-  message.value = ''
-  ulploadItems.value = []
-  for (const prop in Array.from(files)) {
-    media.value.unshift({ name: 'spinner.gif', path: '', folder: selectedFolder.value, mimetype: 'image' })
+
+  if (gallery.length > 20) return (errorMsg.value = '20 files maximum')
+
+  for (const prop in gallery) {
+    media.value.unshift({
+      name: 'spinner.gif',
+      originalName: gallery[prop].name,
+      path: '',
+      folder: selectedFolder.value,
+      mimetype: gallery[prop].type,
+    })
   }
+
+  if (!gallery.length) return
+  const formData = new FormData()
+  for (const prop in gallery) {
+    formData.append('gallery', gallery[prop])
+  }
+  formData.append('folder', selectedFolder.value.id)
+
+  response = await saveMedia(formData)
+  console.log(response)
+  if (!response) return
+
+  for (const prop in media.value) {
+    const i = response.media.findIndex((m) => m.originalName == media.value[prop].originalName)
+    console.log(i)
+    if (i !== -1) media.value[prop] = response.media[i]
+  }
+  // showModal.value = true
+  // showDropZone.value = false
+  // errorMsg.value = ''
+  // message.value = ''
+  // ulploadItems.value = []
+  // for (const prop in files) {
+  //   media.value.unshift({
+  //     name: 'spinner.gif',
+  //     originalName: files[prop].name,
+  //     path: '',
+  //     folder: selectedFolder.value,
+  //     mimetype: files[prop].type,
+  //   })
+  // }
+  // console.log('XXXXX', media.value)
+  // const formData = new FormData()
+  // // await Promise.all(
+  // // files.map(async (item) => {
+  // formData.append('gallery', item)
+  // formData.append('folder', selectedFolder.value.id)
+  // response = await fetch(`${config.apiUrl}/media`, {
+  //   method: 'POST',
+  //   body: formData,
+  //   // headers: new Headers({
+  //   // 'Content-Type': 'application/json',
+  //   // Authorization: `Bearer ${token.value}`,
+  //   // }),
+  // })
+  // // response = await saveMedia(formData)
+  // console.log(response)
+  // if (response) {
+  //   const i = media.value.findIndex((m) => m.originalName == response.media.originalName)
+  //   console.log(i)
+  //   if (i !== -1) media.value[i] = response.media
+  // }
+
+  // const { data, pending, error } = await useFetch(`${config.API_URL}/media/${item._id}`, {
+  //   method: 'DELETE',
+  // })
+  // if (error.value) console.log(error.value.data)
+  // if (error.value) errorMsg.value += `${error.value.data.message}<br>`
+  // else message.value += `${item.name} deleted.<br>`
+  // })
+  // )
 
   // for (const prop in Array.from(files)) {
   //   ulploadItems.value[prop] = {}
@@ -236,22 +303,20 @@ const removeFromSelectedMedia = (file) => {
 
 // // Delete media
 const deleteMedia = async () => {
-  errorMsg.value = ''
-  message.value = ''
+  if (!confirm('Are you sure you want to delete these files?')) return
   console.log(selectedMedia.value)
   await Promise.all(
     selectedMedia.value.map(async (item) => {
-      const { data, pending, error } = await useFetch(`${config.API_URL}/media/${item._id}`, {
-        method: 'DELETE',
-      })
-      if (error.value) console.log(error.value.data)
-      if (error.value) errorMsg.value += `${error.value.data.message}<br>`
-      else message.value += `${item.name} deleted.<br>`
+      response = await deleteDoc('media', item.id)
+      console.log(response)
     })
   )
-  selectedMedia.value = []
-  alert.value.show = false
-  await fetchMedia()
+  if (!errorMsg.value) {
+    await fetchMedia()
+    message.value = 'Media deleted succesfully'
+    console.log(message.value)
+    selectedMedia.value = []
+  }
 }
 
 // // Move media to a different folder
@@ -400,7 +465,7 @@ await fetchMedia()
           @toggleSort="toggleMediaSort"
           @fileUploadBtnClicked="handleFileUploadBtnClicked"
           @moveMediaToFolder="handleMoveMediaToFolder"
-          @deleteMediaBtnClicked="showMediaDeleteAlert"
+          @deleteMedia="deleteMedia"
           @searchKeywordSelected="handleSearch"
         />
         <transition name="dropZone">
