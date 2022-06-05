@@ -44,6 +44,10 @@
   position: fixed;
 }
 
+.sticky {
+  position: sticky;
+}
+
 .overflow-auto {
   overflow: auto;
 }
@@ -66,6 +70,10 @@
 
 .top-7 {
   top: 7rem;
+}
+
+.bottom-4 {
+  bottom: 4rem;
 }
 
 .right-0 {
@@ -98,8 +106,4 @@
 
 .left-1 {
   left: 1rem;
-}
-
-.sticky {
-  position: sticky;
 }

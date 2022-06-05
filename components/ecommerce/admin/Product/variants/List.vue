@@ -64,7 +64,7 @@ const handleSaveVariant = (event) => {
           <img
             class="w-full hfull contain"
             v-if="variant.gallery[0]"
-            :src="`${config.backendUrl}/${variant.gallery[0].path}/${variant.gallery[0].name}`"
+            :src="`${config.backendUrl}/${variant.gallery[0].path}`"
             alt="Variant Image"
           />
           <img class="w-full h-full contain" v-else src="/placeholder.png" alt="Variant Image" />

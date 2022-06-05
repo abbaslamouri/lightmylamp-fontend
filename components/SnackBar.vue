@@ -72,7 +72,9 @@ const transitionName = computed(() => (getPosition().includes('right') ? 'rtl' :
         <h3>{{ title }}</h3>
         <div v-html="message"></div>
       </div>
-      <button class="btn btn__close" @click="$emit('hideSnackbar')"><IconsClose class="fill-slate-50" /></button>
+      <button class="btn btn__close" @click="$emit('hideSnackbar')">
+        <IconsClose class="fill-slate-50" />
+      </button>
     </div>
   </transition>
 </template>

@@ -24,6 +24,7 @@ const slug = route.params.slug === '_' ? null : route.params.slug
 if (slug) {
   response = await fetchAll('products', { slug })
   if (response.docs) product.value = response.docs[0]
+  console.log(response)
   if (product.value.id) {
     response = await fetchAll('variants', { product: product.value.id })
     if (response.docs) product.value.variants = response.docs

@@ -1,6 +1,4 @@
 <script setup>
-// import slugify from 'slugify'
-
 const props = defineProps({
   media: {
     type: Array,
@@ -18,10 +16,10 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['folderSaved', 'toggleSort', 'deleteFolder'])
+const emit = defineEmits(['savedFolder', 'toggleSort', 'deleteFolder'])
 const config = useRuntimeConfig()
 
-const { fetchAll, saveDoc } = useHttp()
+const { fetchAll } = useHttp()
 
 const { message, errorMsg, alert } = useAppState()
 const showForm = ref(false)
@@ -30,7 +28,7 @@ const newFolder = ref({})
 
 const editFolder = () => {
   newFolder.value.name = props.selectedFolder.name
-  newFolder.value._id = props.selectedFolder._id
+  newFolder.value.id = props.selectedFolder.id
   showForm.value = true
 }
 
@@ -40,39 +38,9 @@ const cancelEditFolder = () => {
 }
 
 const saveNewFolder = async () => {
-  const response = await saveDoc('media/folders', newFolder.value)
-  console.log(response)
-  if (!response) return
-  emit('folderSaved', response)
-  // folders.value.push(response.doc)
-  // errorMsg.value = null
-  // message.value = null
-  // try {
-  // newFolder.value.slug = slugify(newFolder.value.name, { lower: true })
-  // if (newFolder.value._id) {
-  //   const { data, pending, error } = await useFetch(`${config.API_URL}/media/folders/${newFolder.value._id}`, {
-  //     method: 'PATCH',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: newFolder.value,
-  //   })
-  //   if (error.value) throw error.value
-  //   console.log(data.value)
-  //   emit('folderSaved', data.value.doc)
-  // } else {
-  //   const { data, pending, error } = await useFetch(`${config.API_URL}/media/folders`, {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: newFolder.value,
-  //   })
-  //   if (error.value) throw error.value
-  //   console.log(data.value)
-  //   emit('folderSaved', data.value.doc)
-  // }
+  emit('savedFolder', newFolder.value)
   showForm.value = false
   newFolder.value = {}
-  // } catch (err) {
-  //   errorMsg.value = err.data.message
-  // }
 }
 </script>
 
@@ -102,12 +70,8 @@ const saveNewFolder = async () => {
           @toggleSort="$emit('toggleSort', $event)"
           v-if="folders.length > 1"
         />
-        <!-- <button class="btn">
-          <IconsSouth class="w-2 h-2 fill-sky-600" v-if="folderSortOrder == '-'" />
-          <IconsNorth class="w-2 h-2 fill-sky-600" v-else />
-        </button> -->
       </div>
-      <div class="flex-row items-center gap-1" v-if="selectedFolder._id">
+      <div class="flex-row items-center gap-1" v-if="selectedFolder.id">
         <button class="btn" @click="editFolder">
           <IconsEditFill class="fill-green-800" />
         </button>

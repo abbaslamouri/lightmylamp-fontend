@@ -1,4 +1,10 @@
 <script setup>
+const props = defineProps({
+  fileTypes: {
+    type: Array,
+    default: ['image/*'],
+  },
+})
 const emit = defineEmits(['uploadItemsSelected', 'cancelFileUpload'])
 
 const fileRef = ref(null)
@@ -32,7 +38,7 @@ const handleItemsSelected = (event) => {
         class="hidden"
         id="upload"
         type="file"
-        accept="image/*, application/pdf"
+        :accept="fileTypes.join(',')"
         :multiple="true"
         ref="fileRef"
         @change="handleItemsSelected"

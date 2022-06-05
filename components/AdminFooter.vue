@@ -1,5 +1,5 @@
 <template>
-  <div class="py2 flex-row justify-center">
+  <div class="h-full flex-col text-slate-50 justify-center items-center">
     &copy; YRL Consulting, LLC
     </div>
 </template>

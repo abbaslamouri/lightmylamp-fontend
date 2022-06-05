@@ -101,18 +101,20 @@
 
   &__close {
     border: 1px solid transparent;
+    background-color: transparent;
     border-radius: 5px;
+
     // padding: 1rem;
 
     &:hover {
       border: 1px solid $stone-400;
-      background-color: $stone-200;
+      // background-color: $stone-200;
     }
 
-    svg {
-      width: 2rem;
-      height: 2rem;
-    }
+    // svg {
+    //   width: 2rem;
+    //   height: 2rem;
+    // }
   }
 
   &__checkout {

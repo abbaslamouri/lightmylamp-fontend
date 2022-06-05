@@ -213,7 +213,36 @@ const useHttp = () => {
     }
   }
 
-  return { fetchAll, fetchDoc, saveDoc, deleteDoc, deleteDocs, saveMedia }
+  const seedProducts = async (payload) => {
+    console.log('here')
+    errorMsg.value = null
+    message.value = null
+    let response = null
+    // const token =
+    //   useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
+    //     ? useCookie('auth').value.token
+    //     : null
+    try {
+      response = await fetch(`${config.apiUrl}/products/seeder`, {
+        method: 'POST',
+        body: payload,
+        headers: new Headers({
+          // 'Content-Type': 'application/json',
+          Authorization: `Bearer ${token.value}`,
+        }),
+      })
+      console.log(response)
+      if (response.ok) return await response.json()
+      if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
+      throw getErrorStr((await response.json()).errors)
+    } catch (err) {
+      console.log('MYERROR', err)
+      errorMsg.value = err
+      return false
+    }
+  }
+
+  return { fetchAll, fetchDoc, saveDoc, deleteDoc, deleteDocs, saveMedia, seedProducts }
 }
 
 export default useHttp

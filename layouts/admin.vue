@@ -23,7 +23,7 @@ if (process.client) {
         <AdminNav />
       </aside>
     </transition>
-    <main :class="{ full: !showAdminSidebar }">
+    <main :class="{ 'h-full': !showAdminSidebar }">
       <header class="flex-row items-center justify-between px-2 text-slate-50">
         <MobileNavToggler @hideAdminSidebar="showAdminSidebar = !showAdminSidebar" />
         <div>
@@ -34,7 +34,7 @@ if (process.client) {
       <div class="content">
         <slot />
       </div>
-      <footer class="text-slate-50"><AdminFooter /></footer>
+      <footer class=""><AdminFooter /></footer>
     </main>
   </div>
 </template>
@@ -56,6 +56,8 @@ if (process.client) {
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
+    height: 100vh;
+
     // justify-content: space-between;
     header {
       position: sticky;

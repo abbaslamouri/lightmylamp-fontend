@@ -12,7 +12,7 @@ const folders = ref([])
 const selectedFolder = ref({})
 // const folderToDelete = ref(null)
 const page = ref(1)
-const perPage = ref(7)
+const perPage = ref(50)
 // const folderSort. field('name')
 // const folderSortOrder = ref('')
 // const mediaSortField = ref('name')
@@ -105,13 +105,13 @@ const fetchMedia = async () => {
   totalCount.value = response.totalCount
 }
 
-const overallFileUploadProgress = computed(() => {
-  let sum = 0
-  for (const prop in ulploadItems.value) {
-    sum = sum + ulploadItems.value[prop].progress
-  }
-  return ulploadItems.value.length ? sum / ulploadItems.value.length : 0
-})
+// const overallFileUploadProgress = computed(() => {
+//   let sum = 0
+//   for (const prop in ulploadItems.value) {
+//     sum = sum + ulploadItems.value[prop].progress
+//   }
+//   return ulploadItems.value.length ? sum / ulploadItems.value.length : 0
+// })
 
 // const fetchMedia = async () => {
 //   errorMsg.value = null
@@ -142,7 +142,7 @@ const handleUplodMedia = async (gallery) => {
   console.log(selectedFolder.value)
   showDropZone.value = false
 
-  if (gallery.length > 20) return (errorMsg.value = '20 files maximum')
+  if (gallery.length > 200) return (errorMsg.value = '200 files maximum')
 
   for (const prop in gallery) {
     media.value.unshift({
@@ -162,14 +162,15 @@ const handleUplodMedia = async (gallery) => {
   formData.append('folder', selectedFolder.value.id)
 
   response = await saveMedia(formData)
-  console.log(response)
+  // console.log(response)
   if (!response) return
 
   for (const prop in media.value) {
     const i = response.media.findIndex((m) => m.originalName == media.value[prop].originalName)
-    console.log(i)
+    // console.log(i)
     if (i !== -1) media.value[prop] = response.media[i]
   }
+  await fetchMedia()
   // showModal.value = true
   // showDropZone.value = false
   // errorMsg.value = ''
@@ -271,10 +272,14 @@ const handleSelectFolder = async (folder) => {
 }
 
 //save folder
-const handleFolderSaved = async (folder) => {
-  const index = folders.value.findIndex((f) => f.id == folder.id)
-  if (index !== -1) folders.value.splice(index, 1, folder)
-  else folders.value.push(folder)
+const savedFolder = async (newFolder) => {
+  const response = await saveDoc('media/folders', newFolder)
+  console.log(response)
+  if (!response) return
+  await fetchFolders()
+  // const index = folders.value.findIndex((f) => f.id == response.doc.id)
+  // if (index !== -1) folders.value.splice(index, 1, folder)
+  // folders.value.push(newFolder)
 }
 
 // Toggle folder sort
@@ -394,6 +399,7 @@ const deleteFolder = async () => {
   if (!response) return (errorMsg.value = `We were not able to delete folder ${selectedFolder.value.name} deleted`)
   fetchFolders()
   message.value = `Folder ${selectedFolder.value.name} deleted succesfully`
+  selectedFolder.value = {}
 
   // try {
   //   const { data, pending, error } = await useFetch(`${config.API_URL}/media/folders/${selectedFolder.value._id}`, {
@@ -442,7 +448,7 @@ await fetchMedia()
             :sort="folderSort"
             :sortOptions="folderSortOptions"
             @toggleSort="toggleFolderSort"
-            @folderSaved="handleFolderSaved"
+            @savedFolder="savedFolder"
             @deleteFolder="deleteFolder"
           />
         </div>
@@ -467,6 +473,7 @@ await fetchMedia()
           @moveMediaToFolder="moveMediaToFolder"
           @deleteMedia="deleteMedia"
           @searchKeywordSelected="handleSearch"
+          @selectAll="selectedMedia = media"
         />
         <transition name="dropZone">
           <MediaDropZone

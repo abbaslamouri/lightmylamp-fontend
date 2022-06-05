@@ -27,6 +27,7 @@ const emit = defineEmits([
   'deleteMedia',
   'searchKeywordSelected',
   'deleteMedia',
+  'selectAll',
 ])
 
 const mediaToDisplay = ref('all')
@@ -102,6 +103,7 @@ const handleMoveMedia = async () => {
           />
         </div>
         <button class="btn bg-slate-200 px-2 py-1">Bulk Select</button>
+        <button class="btn bg-slate-200 px-2 py-1" @click="$emit('selectAll')">Select All</button>
       </div>
       <Search class="" @searchKeywordSelected="$emit('searchKeywordSelected', $event)" />
     </div>

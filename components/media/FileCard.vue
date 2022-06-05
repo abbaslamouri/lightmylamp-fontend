@@ -10,11 +10,11 @@ const config = useRuntimeConfig()
 
 <template>
   <div
-    class="card relative cursor-pointer flex-col items-center justify-center h-16 w-16 p-2"
+    class="card relative cursor-pointer flex-col items-center justify-center"
     @mouseenter="$event.target.classList.add('hovered')"
     @mouseleave="$event.target.classList.remove('hovered')"
   >
-    <div v-if="file.mimetype.includes('image')">
+    <div class="h-16 w-16" v-if="file.mimetype.includes('image')">
       <img v-if="file.name === 'spinner.gif'" class="w-full h-full contain" :src="`${config.backendUrl}/spinner.gif`" />
       <img v-else-if="file.path" class="w-full h-full contain" :src="`${config.backendUrl}/${file.path}`" />
       <img v-else class="w-full h-full contain" :src="`${config.backendUrl}/placeholder.png`" />

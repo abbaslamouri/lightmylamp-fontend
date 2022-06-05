@@ -72,9 +72,10 @@ const setPage = async (currentPage) => {
 
 const deleteCategory = async (categoryId) => {
   if (!confirm('Are you sure you want to delete this category?')) return
-  await deleteDoc('categories', categoryId)
+  if (!(await deleteDoc('categories', categoryId))) return
+  const category = categories.value.find((c) => c.id == categoryId)
   fetchAllCategories()
-  message.value = 'Attributes and attribute terms deleted succesfully'
+  message.value = `Category ${category.name} deleted succesfully`
 }
 
 await fetchAllCategories()

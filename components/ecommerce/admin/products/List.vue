@@ -57,8 +57,8 @@ const deleteProduct = (productId) => {
           <div class="w-8 h-8 justify-center items-center">
             <img
               class="w-full h-full cover"
-              v-if="product.gallery.length && product.gallery[1] && product.gallery[1].mimetype.includes('image')"
-              :src="`${config.backendUrl}/${product.gallery[1].path}`"
+              v-if="product.gallery.length && product.gallery[0] && product.gallery[0].mimetype.includes('image')"
+              :src="`${config.backendUrl}/${product.gallery[0].path}`"
             />
             <img v-else class="w-full hfull contain" :src="`/placeholder.png`" />
           </div>
