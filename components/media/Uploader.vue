@@ -142,7 +142,7 @@ const handleUplodMedia = async (gallery) => {
   console.log(selectedFolder.value)
   showDropZone.value = false
 
-  if (gallery.length > 400) return (errorMsg.value = '200 files maximum')
+  if (gallery.length > 300) return (errorMsg.value = '200 files maximum')
 
   for (const prop in gallery) {
     media.value.unshift({
