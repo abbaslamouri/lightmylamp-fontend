@@ -12,7 +12,7 @@ const folders = ref([])
 const selectedFolder = ref({})
 // const folderToDelete = ref(null)
 const page = ref(1)
-const perPage = ref(50)
+const perPage = ref(1500)
 // const folderSort. field('name')
 // const folderSortOrder = ref('')
 // const mediaSortField = ref('name')
@@ -142,7 +142,7 @@ const handleUplodMedia = async (gallery) => {
   console.log(selectedFolder.value)
   showDropZone.value = false
 
-  if (gallery.length > 200) return (errorMsg.value = '200 files maximum')
+  if (gallery.length > 400) return (errorMsg.value = '200 files maximum')
 
   for (const prop in gallery) {
     media.value.unshift({
