@@ -1,13 +1,7 @@
 <script setup>
 defineProps({
-  folders: {
-    type: Array,
-  },
   selectedMedia: {
     type: Array,
-  },
-  selectedFolder: {
-    type: Object,
   },
   sort: {
     type: Object,
@@ -57,21 +51,6 @@ const handleMoveMedia = async () => {
       <div class="flex-row gap-4">
         <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="$emit('toggleSort', $event)" />
         <div class="flex-row items-center gap-2 min-w-60">
-          <div class="min-w-20" v-if="selectedMedia.length">
-            <FormsBaseSelect
-              v-model="moveToFolderId"
-              label="Move Selected To Folder"
-              :options="
-                folders
-                  .filter((f) => f.id != selectedFolder.id)
-                  .map((f) => {
-                    return { key: f._id, name: f.name }
-                  })
-              "
-              nullOption="Select Folder"
-              @update:modelValue="handleMoveMedia"
-            />
-          </div>
           <button class="btn" v-if="selectedMedia.length" @click="$emit('deleteMedia')">
             <IconsDeleteFill class="fill-red-600" />
           </button>

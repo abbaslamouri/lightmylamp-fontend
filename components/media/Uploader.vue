@@ -8,8 +8,8 @@ const selectedMedia = ref([])
 const media = ref([])
 const count = ref(0)
 const totalCount = ref(0)
-const folders = ref([])
-const selectedFolder = ref({})
+// const folders = ref([])
+// const selectedFolder = ref({})
 // const folderToDelete = ref(null)
 const page = ref(1)
 const perPage = ref(1500)
@@ -21,19 +21,19 @@ const keyword = ref('')
 const showDropZone = ref(false)
 // const showModal = ref(false)
 const ulploadItems = ref([])
-const folderFields = 'id, name, slug'
+// const folderFields = 'id, name, slug'
 const fields = 'id, name, slug, originalName, folder, path, mimetype'
 let response = ''
 
-const folderSort = reactive({
-  field: 'name',
-  order: '',
-})
-const folderSortOptions = [
-  { key: 'sortOrder', name: 'Order' },
-  { key: 'name', name: 'Name' },
-  { key: 'createdAt', name: 'Date Created' },
-]
+// const folderSort = reactive({
+//   field: 'name',
+//   order: '',
+// })
+// const folderSortOptions = [
+//   { key: 'sortOrder', name: 'Order' },
+//   { key: 'name', name: 'Name' },
+//   { key: 'createdAt', name: 'Date Created' },
+// ]
 
 const mediaSort = reactive({
   field: 'createdAt',
@@ -45,12 +45,12 @@ const mediaSortOptions = [
   { key: 'createdAt', name: 'Date Created' },
 ]
 
-const folderParams = computed(() => {
-  return {
-    fields: folderFields,
-    sort: `${folderSort.order}${folderSort.field}`,
-  }
-})
+// const folderParams = computed(() => {
+//   return {
+//     fields: folderFields,
+//     sort: `${folderSort.order}${folderSort.field}`,
+//   }
+// })
 
 const params = computed(() => {
   const params = {
@@ -58,7 +58,6 @@ const params = computed(() => {
     page: page.value,
     limit: perPage.value,
     sort: `${mediaSort.order}${mediaSort.field}`,
-    folder: Object.values(selectedFolder.value).length ? selectedFolder.value.id : null,
     keyword: keyword.value ? keyword.value : null,
   }
   if (!params.folder) delete params.folder
@@ -132,24 +131,24 @@ const fetchMedia = async () => {
 
 // Handles upload button click
 const toggleDropZone = () => {
-  if (!selectedFolder.value.id) errorMsg.value = 'Please selecet a folder'
-  else showDropZone.value = !showDropZone.value
+  // if (!selectedFolder.value.id) errorMsg.value = 'Please selecet a folder'
+  showDropZone.value = !showDropZone.value
 }
 
 // Handles meia upload
 const handleUplodMedia = async (gallery) => {
   console.log(gallery)
-  console.log(selectedFolder.value)
+  // console.log(selectedFolder.value)
   showDropZone.value = false
 
-  if (gallery.length > 300) return (errorMsg.value = '200 files maximum')
+  if (gallery.length > 2000) return (errorMsg.value = '200 files maximum')
 
   for (const prop in gallery) {
     media.value.unshift({
       name: 'spinner.gif',
       originalName: gallery[prop].name,
       path: '',
-      folder: selectedFolder.value,
+      // folder: selectedFolder.value,
       mimetype: gallery[prop].type,
     })
   }
@@ -159,7 +158,7 @@ const handleUplodMedia = async (gallery) => {
   for (const prop in gallery) {
     formData.append('gallery', gallery[prop])
   }
-  formData.append('folder', selectedFolder.value.id)
+  // formData.append('folder', selectedFolder.value.id)
 
   response = await saveMedia(formData)
   // console.log(response)
@@ -265,11 +264,11 @@ const setPage = async (currentPage) => {
   await fetchMedia()
 }
 
-const handleSelectFolder = async (folder) => {
-  selectedFolder.value = folder
-  page.value = 1
-  await fetchMedia()
-}
+// const handleSelectFolder = async (folder) => {
+//   selectedFolder.value = folder
+//   page.value = 1
+//   await fetchMedia()
+// }
 
 //save folder
 const savedFolder = async (newFolder) => {
@@ -346,7 +345,7 @@ const moveMediaToFolder = async (folderId) => {
     })
   )
 
-  selectedFolder.value = folder
+  // selectedFolder.value = folder
   // selectedMedia.value = []
   await fetchMedia()
 }
@@ -380,41 +379,41 @@ const setSelectedMedia = () => {
 //   )
 // }
 
-const deleteFolder = async () => {
-  // errorMsg.value = ''
-  // alert.value.show = false
-  if (
-    !confirm(
-      'Are you sure you want to delete this folder?  If your folder contains files, you will have to move or delete those files first.'
-    )
-  )
-    return
-  if (media.value.filter((m) => m.folder == selectedFolder.value.id).length)
-    return (
-      (errorMsg.value =
-        'You cannot delete non-empty folders.  Please delete or move all media to another folder before deleting folders.'),
-      'Error'
-    )
-  const response = await deleteDoc('media/folders', selectedFolder.value.id)
-  if (!response) return (errorMsg.value = `We were not able to delete folder ${selectedFolder.value.name} deleted`)
-  fetchFolders()
-  message.value = `Folder ${selectedFolder.value.name} deleted succesfully`
-  selectedFolder.value = {}
+// const deleteFolder = async () => {
+//   // errorMsg.value = ''
+//   // alert.value.show = false
+//   if (
+//     !confirm(
+//       'Are you sure you want to delete this folder?  If your folder contains files, you will have to move or delete those files first.'
+//     )
+//   )
+//     return
+//   if (media.value.filter((m) => m.folder == selectedFolder.value.id).length)
+//     return (
+//       (errorMsg.value =
+//         'You cannot delete non-empty folders.  Please delete or move all media to another folder before deleting folders.'),
+//       'Error'
+//     )
+//   const response = await deleteDoc('media/folders', selectedFolder.value.id)
+//   if (!response) return (errorMsg.value = `We were not able to delete folder ${selectedFolder.value.name} deleted`)
+//   fetchFolders()
+//   message.value = `Folder ${selectedFolder.value.name} deleted succesfully`
+//   selectedFolder.value = {}
 
-  // try {
-  //   const { data, pending, error } = await useFetch(`${config.API_URL}/media/folders/${selectedFolder.value._id}`, {
-  //     method: 'DELETE',
-  //   })
-  //   if (error.value) throw error.value
-  //   console.log(data.value)
-  //   const index = folders.value.findIndex((f) => f._id == selectedFolder.value._id)
-  //   if (index !== -1) folders.value.splice(index, 1)
-  //   selectedFolder.value = {}
-  //   message.value = `Folder ${selectedFolder.value.name} deleted succesfully`
-  // } catch (err) {
-  //   console.log(err)
-  // }
-}
+//   // try {
+//   //   const { data, pending, error } = await useFetch(`${config.API_URL}/media/folders/${selectedFolder.value._id}`, {
+//   //     method: 'DELETE',
+//   //   })
+//   //   if (error.value) throw error.value
+//   //   console.log(data.value)
+//   //   const index = folders.value.findIndex((f) => f._id == selectedFolder.value._id)
+//   //   if (index !== -1) folders.value.splice(index, 1)
+//   //   selectedFolder.value = {}
+//   //   message.value = `Folder ${selectedFolder.value.name} deleted succesfully`
+//   // } catch (err) {
+//   //   console.log(err)
+//   // }
+// }
 
 // const showAlert = (heading, paragraph, action, showCancelBtn) => {
 //   alert.value.heading = heading
@@ -431,7 +430,7 @@ const deleteFolder = async () => {
 //     if (currentVal === 'ok' && alert.value.action === 'deleteFolder') deleteFolder()
 //   }
 // )
-await fetchFolders()
+// await fetchFolders()
 await fetchMedia()
 </script>
 
@@ -439,7 +438,7 @@ await fetchMedia()
   <div class="media-uploader flex-col h-full">
     <div class="top">
       <!-- <h3 class="title bg-slate-300 p-2 text-center">Media</h3> -->
-      <div class="folders flex-col gap-2 p-2 border-b-stone-300">
+      <!-- <div class="folders flex-col gap-2 p-2 border-b-stone-300">
         <div class="folder__actions">
           <MediaFolderActions
             :selectedFolder="selectedFolder"
@@ -460,12 +459,10 @@ await fetchMedia()
             @folderSelected="handleSelectFolder"
           />
         </div>
-      </div>
+      </div> -->
       <div class="file-actions">
         <MediaFileActions
-          :folders="folders"
           :selectedMedia="selectedMedia"
-          :selectedFolder="selectedFolder"
           :sort="mediaSort"
           :sortOptions="mediaSortOptions"
           @toggleSort="toggleMediaSort"
@@ -478,7 +475,6 @@ await fetchMedia()
         <transition name="dropZone">
           <MediaDropZone
             v-show="showDropZone"
-            :selectedFolder="selectedFolder"
             @cancelFileUpload="toggleDropZone"
             @uploadItemsSelected="handleUplodMedia"
           />
@@ -490,7 +486,6 @@ await fetchMedia()
       <MediaFileList
         :media="media"
         :selectedMedia="selectedMedia"
-        :selectedFolder="selectedFolder"
         @addToSelectedMedia="addToSelectedMedia"
         @removeFromSelectedMedia="removeFromSelectedMedia"
       />
