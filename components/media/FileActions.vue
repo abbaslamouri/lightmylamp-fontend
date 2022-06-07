@@ -48,7 +48,7 @@ const mediaToDisplay = ref('all')
             label="Media Type"
             :options="[
               { key: 'all', name: 'All Media Items' },
-              { key: 'images', name: 'Images' },
+              { key: 'image', name: 'Images' },
               { key: 'pdf', name: 'PDF' },
             ]"
           />

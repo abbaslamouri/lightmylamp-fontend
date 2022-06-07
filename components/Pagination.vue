@@ -74,14 +74,19 @@ const setCurrentPage = async (p) => {
         {{ page + 2 }}
       </span>
       <span
-        v-if="page == 1 || page == 2"
+        v-if="(pages > 3 && page == 1) || page == 2"
         class="page"
         @click="setCurrentPage(page + 1)"
         :class="{ active: active == page + 3 }"
       >
         {{ page + 3 }}
       </span>
-      <span v-if="page == 1" class="page" @click="setCurrentPage(page + 4)" :class="{ active: active == page + 2 }">
+      <span
+        v-if="pages > 4 && page == 1"
+        class="page"
+        @click="setCurrentPage(page + 4)"
+        :class="{ active: active == page + 2 }"
+      >
         {{ page + 4 }}
       </span>
       <span class="page" @click="setCurrentPage(page + 1)" :class="{ disabled: page >= pages }">

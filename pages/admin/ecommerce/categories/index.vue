@@ -48,6 +48,7 @@ const pages = computed(() => {
 
 const fetchAllCategories = async () => {
   response = await fetchAll('categories', params.value)
+  console.log(response)
   categories.value = response.docs
   count.value = response.results
   totalCount.value = response.totalCount
