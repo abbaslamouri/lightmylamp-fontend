@@ -50,7 +50,6 @@ const config = useRuntimeConfig()
       border-color: $slate-600 transparent transparent transparent;
     }
   }
-
   &.hovered {
     background-color: $slate-500;
 

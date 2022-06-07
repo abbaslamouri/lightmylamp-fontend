@@ -6,9 +6,6 @@ defineProps({
   sort: {
     type: Object,
   },
-  // mediaSortOrder: {
-  //   type: String,
-  // },
   sortOptions: {
     type: Array,
     required: true,
@@ -17,28 +14,13 @@ defineProps({
 const emit = defineEmits([
   'fileUploadBtnClicked',
   'toggleSort',
-  'moveMediaToFolder',
   'deleteMedia',
   'searchKeywordSelected',
-  'deleteMedia',
-  'selectAll',
+  'toggleSelectAll',
+  'selectMediaType',
 ])
 
 const mediaToDisplay = ref('all')
-const datesToDisplay = ref('all')
-
-// const keyword = ref(null)
-const moveToFolderId = ref('')
-const showMediaMoveAlert = ref(false)
-// const showMediaDeleteAlert = ref(false)
-
-const handleMoveMedia = async () => {
-  if (!confirm('Are you sure you want to move these files')) return
-  console.log(moveToFolderId.value)
-  // showMediaMoveAlert.value = false
-  emit('moveMediaToFolder', moveToFolderId.value)
-  moveToFolderId.value = ''
-}
 </script>
 
 <template>
@@ -59,32 +41,22 @@ const handleMoveMedia = async () => {
     </div>
     <div class="flex-row items-center justify-between px-2">
       <div class="px-2 py-1 flex-row items-center gap-2">
-        <IconsListBulleted class="" />
-        <IconsListTiled class="" />
         <div class="w-16">
           <FormsBaseSelect
-            label="Media Type"
             v-model="mediaToDisplay"
+            @update:modelValue="$emit('selectMediaType', mediaToDisplay)"
+            label="Media Type"
             :options="[
               { key: 'all', name: 'All Media Items' },
               { key: 'images', name: 'Images' },
+              { key: 'pdf', name: 'PDF' },
             ]"
           />
         </div>
-        <div class="w-16">
-          <FormsBaseSelect
-            label="Dates"
-            v-model="datesToDisplay"
-            :options="[
-              { key: 'all', name: 'All Dates' },
-              { key: 'september 2022', name: 'September 2022' },
-            ]"
-          />
-        </div>
-        <button class="btn bg-slate-200 px-2 py-1">Bulk Select</button>
-        <button class="btn bg-slate-200 px-2 py-1" @click="$emit('selectAll')">Select All</button>
+        <button class="btn bg-slate-200 px-2 py-1" @click="$emit('toggleSelectAll', true)">Select All</button>
+        <button class="btn bg-slate-200 px-2 py-1" @click="$emit('toggleSelectAll', false)">DeSelect All</button>
       </div>
-      <Search class="" @searchKeywordSelected="$emit('searchKeywordSelected', $event)" />
+      <Search @searchKeywordSelected="$emit('searchKeywordSelected', $event)" />
     </div>
   </div>
 </template>

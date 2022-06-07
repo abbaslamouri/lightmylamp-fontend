@@ -12,7 +12,7 @@ const totalCount = ref(0)
 // const selectedFolder = ref({})
 // const folderToDelete = ref(null)
 const page = ref(1)
-const perPage = ref(1500)
+const perPage = ref(50)
 // const folderSort. field('name')
 // const folderSortOrder = ref('')
 // const mediaSortField = ref('name')
@@ -73,11 +73,11 @@ const pages = computed(() =>
 
 console.log(errorMsg.value)
 
-const fetchFolders = async () => {
-  response = await fetchAll('media/folders', folderParams.value)
-  folders.value = response.docs
-  console.log(folders.value)
-}
+// const fetchFolders = async () => {
+//   response = await fetchAll('media/folders', folderParams.value)
+//   folders.value = response.docs
+//   console.log(folders.value)
+// }
 
 // const fetchFolders = async () => {
 //   errorMsg.value = null
@@ -431,35 +431,34 @@ const setSelectedMedia = () => {
 //   }
 // )
 // await fetchFolders()
+
+const selectMediaType = async (event) => {
+  console.log('EEEE', event)
+  response = await fetchAll('media', { mimetype: { $regex: new RegExp(event, 'i') } })
+  console.log('Media', response)
+  // media.value = response.docs
+  // count.value = response.results
+  // totalCount.value = response.totalCount
+  // params.value.mimetype = event
+  // await fetchMedia()
+
+  // selectedMedia.value = []
+  // response = await fetchAll('media', params.value)
+  // console.log('Media', response)
+  // media.value = response.docs
+  // count.value = response.results
+  // totalCount.value = response.totalCount
+}
+
+const toggleSelectAll = (event) => {
+  selectedMedia.value = event ? media.value : []
+}
 await fetchMedia()
 </script>
 
 <template>
   <div class="media-uploader flex-col h-full">
     <div class="top">
-      <!-- <h3 class="title bg-slate-300 p-2 text-center">Media</h3> -->
-      <!-- <div class="folders flex-col gap-2 p-2 border-b-stone-300">
-        <div class="folder__actions">
-          <MediaFolderActions
-            :selectedFolder="selectedFolder"
-            :folders="folders"
-            :media="media"
-            :sort="folderSort"
-            :sortOptions="folderSortOptions"
-            @toggleSort="toggleFolderSort"
-            @savedFolder="savedFolder"
-            @deleteFolder="deleteFolder"
-          />
-        </div>
-        <div class="forlder__list">
-          <MediaFolderList
-            v-if="folders.length"
-            :folders="folders"
-            :selectedFolder="selectedFolder"
-            @folderSelected="handleSelectFolder"
-          />
-        </div>
-      </div> -->
       <div class="file-actions">
         <MediaFileActions
           :selectedMedia="selectedMedia"
@@ -470,11 +469,13 @@ await fetchMedia()
           @moveMediaToFolder="moveMediaToFolder"
           @deleteMedia="deleteMedia"
           @searchKeywordSelected="handleSearch"
-          @selectAll="selectedMedia = media"
+          @toggleSelectAll="toggleSelectAll"
+          @selectMediaType="selectMediaType"
         />
         <transition name="dropZone">
           <MediaDropZone
             v-show="showDropZone"
+            :fileTypes="['image/*', 'text/csv', 'application/pdf']"
             @cancelFileUpload="toggleDropZone"
             @uploadItemsSelected="handleUplodMedia"
           />
@@ -483,56 +484,19 @@ await fetchMedia()
     </div>
 
     <div class="bottom flex-col justify-between gap-1 flex-1 overflow-auto p-2">
-      <MediaFileList
-        :media="media"
-        :selectedMedia="selectedMedia"
-        @addToSelectedMedia="addToSelectedMedia"
-        @removeFromSelectedMedia="removeFromSelectedMedia"
-      />
+      <div v-if="!media.length">loading</div>
+      <div v-else>
+        <MediaFileList
+          :media="media"
+          :selectedMedia="selectedMedia"
+          @addToSelectedMedia="addToSelectedMedia"
+          @removeFromSelectedMedia="removeFromSelectedMedia"
+        />
+      </div>
       <div class="pagination">
         <Pagination :page="page" :pages="pages" @pageSet="setPage" v-if="pages > 1 && !keyword" />
       </div>
     </div>
-    <!-- <div v-if="showModal">
-      <Modal @closeModal="showModal = false">
-        <template #header>
-          <h3 class="modal-header">File Upload Progress</h3>
-          <div>{{ Math.round(overallFileUploadProgress) }}%</div>
-        </template>
-        <template #default>
-          <div class="modal-content">
-            <div class="flex-row justify-between items-center" v-for="(file, index) in ulploadItems" :key="file.name">
-              <div>
-                <span>{{ file.name }}</span
-                ><span>({{ file.status }})</span>
-              </div>
-              <div class="flex-row gap-2 items-center">
-                <span> {{ Math.round(file.progress) }}% </span>
-                <IconsProgressRing :progress="file.progress" />
-              </div>
-              <button
-                class="btn btn__primary px-1 py-05"
-                v-if="file.progress < 100"
-                @click="ulploadItems[index].status = 'cancelled'"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </template>
-        <template #footer>
-          <div class="modal-footer flex-row justify-end px-3 py-1">
-            <button
-              class="btn btn__primary px-2 py-05"
-              v-if="overallFileUploadProgress == 100"
-              @click="handleCloseUploadModal"
-            >
-              Close
-            </button>
-          </div>
-        </template>
-      </Modal>
-    </div> -->
     <div class="actions bg-slate-300 py-2 px-4 flex-row gap-2 justify-end" v-if="route.name !== 'admin-media'">
       <button class="btn btn__secondary cancel px-2 py-1" @click="$emit('mediaSelectCancel')">Cancel</button>
       <button class="btn btn__primary px-2 py-1" @click="setSelectedMedia">Select</button>
