@@ -36,59 +36,38 @@ const setCurrentPage = async (p) => {
       <span class="page" @click="setCurrentPage(page - 1)" :class="{ disabled: page == 1 }">
         <IconsChevronLeft />
       </span>
-      <span v-if="page == 18" class="page" @click="setCurrentPage(page - 4)" :class="{ active: active == page - 4 }">
-        {{ page - 4 }}
-      </span>
-      <span
-        v-if="page == 17 || page == 18"
-        class="page"
-        @click="setCurrentPage(page - 3)"
-        :class="{ active: active == page - 3 }"
-      >
-        {{ page - 3 }}
-      </span>
-
-      <span v-if="page > 2" class="page" @click="setCurrentPage(page - 2)" :class="{ active: active == page - 2 }">
-        {{ page - 2 }}
-      </span>
-      <span v-if="page > 1" class="page" @click="setCurrentPage(page - 1)" :class="{ active: active == page - 1 }">
-        {{ page - 1 }}
-      </span>
-      <span class="page" @click="setCurrentPage(page)" :class="{ active: active == page }">
-        {{ page }}
-      </span>
-      <span
-        v-if="pages > 1 && page <= pages - 1"
-        class="page"
-        @click="setCurrentPage(page + 1)"
-        :class="{ active: active == page + 1 }"
-      >
-        {{ page + 1 }}
-      </span>
-      <span
-        v-if="pages > 2 && page <= pages - 2"
-        class="page"
-        @click="setCurrentPage(page + 2)"
-        :class="{ active: active == page + 2 }"
-      >
-        {{ page + 2 }}
-      </span>
-      <span
-        v-if="(pages > 3 && page == 1) || page == 2"
-        class="page"
-        @click="setCurrentPage(page + 1)"
-        :class="{ active: active == page + 3 }"
-      >
-        {{ page + 3 }}
-      </span>
-      <span
-        v-if="pages > 4 && page == 1"
-        class="page"
-        @click="setCurrentPage(page + 4)"
-        :class="{ active: active == page + 2 }"
-      >
-        {{ page + 4 }}
-      </span>
+      <div class="pagination flex-row justify-center gap-05" v-if="pages <= 5">
+        <span v-for="p in pages" class="page" @click="setCurrentPage(p)" :class="{ active: active == p }">
+          {{ p }}
+        </span>
+      </div>
+      <div class="pagination flex-row justify-center gap-05" v-else>
+        <div class="pagination flex-row justify-center gap-05" v-if="page <= 3">
+          <span v-for="p in 5" class="page" @click="setCurrentPage(p)" :class="{ active: active == p }">
+            {{ p }}
+          </span>
+        </div>
+        <div class="pagination flex-row justify-center gap-05" v-else-if="page > 3 && page < pages - 3">
+          <span
+            v-for="p in 5"
+            class="page"
+            @click="setCurrentPage(page - 3 + p)"
+            :class="{ active: active == page - 3 + p }"
+          >
+            {{ page - 3 + p }}
+          </span>
+        </div>
+        <div class="pagination flex-row justify-center gap-05" v-else>
+          <span
+            v-for="p in 5"
+            class="page"
+            @click="setCurrentPage(pages - 5 + p)"
+            :class="{ active: active == pages - 5 + p }"
+          >
+            {{ pages - 5 + p }}
+          </span>
+        </div>
+      </div>
       <span class="page" @click="setCurrentPage(page + 1)" :class="{ disabled: page >= pages }">
         <IconsChevronRight />
       </span>
@@ -97,7 +76,7 @@ const setCurrentPage = async (p) => {
       </span>
     </div>
     <div class="flex-row items-center gap-1 text-sm">
-      <span class="">Go&nbsp;to</span>
+      <span class="">Go&nbsp;to&nbsp;page</span>
       <label class="base-select min-w-6">
         <select class="select min-h-20" v-model="page" @change="setCurrentPage(parseInt($event.target.value))">
           <option v-for="p in pages" :key="p" :value="p">{{ p }}</option>

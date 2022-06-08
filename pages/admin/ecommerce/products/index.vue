@@ -11,9 +11,8 @@ const { fetchAll, deleteDoc, deleteDocs } = useHttp()
 const products = ref([])
 const totalCount = ref(null) // Total item count in the database
 const count = ref(null) // item count taking into account params
-const showActionKeys = ref([])
 const page = ref(1)
-const perPage = ref(25)
+const perPage = ref(10)
 const fields = '-updatedAt'
 const keyword = ref('')
 const sort = reactive({
@@ -71,6 +70,10 @@ const setPage = async (currentPage) => {
   await fetchAllProducts()
 }
 
+const setPerPage = async () => {
+  await fetchAllProducts()
+}
+
 const deleteProduct = async (productId) => {
   if (
     !confirm(
@@ -102,14 +105,15 @@ await fetchAllProducts()
       </header>
       <main class="flex-1 max-width-130 w-full flex-col gap-3">
         <div class="flex-col gap-3 flex-col br-5">
-          <div class="flex-row gap-3" v-if="totalCount">
-            <Search class="flex-1" @searchKeywordSelected="handleSearch" v-if="totalCount && products.length > 1" />
+          <div class="flex-row items-center gap-4" v-if="totalCount">
+            <FormsBaseInput name="Per Page" label="Per Page" v-model="perPage" @update:modelValue="setPerPage" />
             <Sort
               :sort="sort"
               :sortOptions="sortOptions"
               @toggleSort="toggleSort"
               v-if="totalCount && products.length > 1"
             />
+            <Search class="flex-1" @searchKeywordSelected="handleSearch" v-if="totalCount && products.length > 1" />
           </div>
           <EcommerceAdminProductsList :products="products" :totalCount="totalCount" @deleteProduct="deleteProduct" />
         </div>
