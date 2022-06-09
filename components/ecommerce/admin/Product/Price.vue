@@ -1,5 +1,5 @@
 <script setup>
-const product  = useState('product')
+const product = useState('product')
 </script>
 
 <template>
@@ -8,9 +8,9 @@ const product  = useState('product')
       <div class="uppercase inline-block border-b-stone-300 font-bold pb-05">Price</div>
       <div></div>
     </div>
-    <div class="flex-col gap-2">
-      <div><FormsBaseInput label="Price" required currency v-model="product.price" /></div>
-      <div><FormsBaseInput label="Sale Price" currency v-model="product.salePrice" /></div>
+    <div class="flex-row gap-2">
+      <div class="flex-1"><FormsBaseInput label="Price" required currency v-model="product.price" /></div>
+      <div class="flex-1"><FormsBaseInput label="Sale Price" currency v-model="product.salePrice" /></div>
     </div>
   </section>
 </template>

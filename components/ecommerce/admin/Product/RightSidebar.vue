@@ -32,11 +32,11 @@ const updateProductCategories = (event) => {
       <div class="flex-col gap-2">
         <div class="flex-col gap-2">
           <button class="btn btn__checkout px-2 py-1" @click.prevent="$emit('saveProduct')">Save Changes</button>
-          <FormsBaseToggle v-model="product.active" label="Active" />
+          <!-- <FormsBaseToggle v-model="product.active" label="Active" /> -->
         </div>
       </div>
     </section>
-    <section class="shadow-md w-full bg-white p-2 br-5">
+    <!-- <section class="shadow-md w-full bg-white p-2 br-5">
       <div class="flex-row items-center justify-between text-sm mb-1">
         <div class="uppercase inline-block border-b-stone-300 font-bold pb05">Categories</div>
         <div></div>
@@ -58,7 +58,7 @@ const updateProductCategories = (event) => {
           <span>Edit Categories</span>
         </NuxtLink>
       </div>
-    </section>
+    </section> -->
   </div>
 </template>
 

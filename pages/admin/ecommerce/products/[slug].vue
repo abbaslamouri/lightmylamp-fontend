@@ -112,46 +112,38 @@ watch(
       <h3 class="header">Edit Product</h3>
     </header>
     <main class="main flex-1 max-width-130 w-full">
-      <div class="left-sidebar shadow-md">
+      <!-- <div class="left-sidebar shadow-md">
         <EcommerceAdminProductLeftSidebar :product="product" />
-      </div>
+      </div> -->
       <div class="flex-col gap-2">
-        <EcommerceAdminProductGeneralInfo
-          :product="product"
-          @updateGeneralInfo="product.value = { ...product.value, ...$event }"
-        />
+        <EcommerceAdminProductGeneralInfo />
         <EcommerceAdminProductPrice :product="product" @updatePrice="product.value = { ...product.value, ...$event }" />
+        <EcommerceAdminProductEligibility />
+        <EcommerceAdminProductNextHigherAssembly />
         <EcommerceAdminProductStockManagement
           :product="product"
           @updateStock="product.value = { ...product.value, ...$event }"
         />
-        <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
-          <EcommerceAdminImageGallery
-            :gallery="product.gallery"
-            :galleryIntro="galleryIntro"
-            @removeGalleryImage="product.gallery.splice($event, 1)"
-            @setGalleryImage="product.gallery[$event.index] = $event.value"
-          />
-        </section>
-        <EcommerceAdminProductAttributesContent
+
+        <!-- <EcommerceAdminProductAttributesContent
           v-if="product.id && product.productType === 'variable'"
           @toggleAttributesSlideout="showAttributesSlideout = $event"
-        />
-        <EcommerceAdminProductAttributesSlideout
+        /> -->
+        <!-- <EcommerceAdminProductAttributesSlideout
           v-if="showAttributesSlideout"
           @toggleAttributesSlideout="showAttributesSlideout = $event"
           @saveAttributes="saveProduct"
-        />
+        /> -->
 
-        <EcommerceAdminProductVariantsContent
+        <!-- <EcommerceAdminProductVariantsContent
           @toggleVariantsSlideout="showVariantsSlideout = $event"
           v-if="product.id && product.productType === 'variable' && product.attributes.length"
-        />
-        <EcommerceAdminProductVariantsSlideout
+        /> -->
+        <!-- <EcommerceAdminProductVariantsSlideout
           v-if="showVariantsSlideout"
           @toggleVariantsSlideout="showVariantsSlideout = $event"
           @saveVariants="saveProduct"
-        />
+        /> -->
         <!-- <EcommerceProductDetails :product="product" @updateDetails="product.value = { ...product.value, ...$event }" /> -->
 
         <!-- <EcommerceProductShippingOptions :product="product" /> -->
@@ -162,6 +154,11 @@ watch(
       </div>
       <div class="right-sidebar">
         <EcommerceAdminProductRightSidebar @productStatusUpdated="product.status = $event" @saveProduct="saveProduct" />
+        <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
+          <EcommerceAdminImageGallery
+            :gallery="product.gallery"
+          />
+        </section>
       </div>
     </main>
     <div class="w-full flex-row justify-end px-4 sticky bottom-4 go-to-top">
@@ -176,7 +173,7 @@ watch(
 
 .main {
   display: grid;
-  grid-template-columns: 18rem 1fr 25rem;
+  grid-template-columns: 1fr 25rem;
   gap: 2rem;
   align-items: flex-start;
 

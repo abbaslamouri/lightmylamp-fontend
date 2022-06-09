@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="">
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
@@ -36,8 +36,9 @@ const signin = async () => {
     errorMsg.value = `<ul>${errorMsg.value}</ul>`
   }
   console.log(data.value)
-  const tokenCookie = useCookie('token')
-  const userCookie = useCookie('user')
+  const tokenCookie = useCookie('token', { maxAge: data.value.cookieExpires * 24 * 60 * 60 })
+  const userCookie = useCookie('user', { maxAge: data.value.cookieExpires * 24 * 60 * 60 })
+  console.log('COOKIE', tokenCookie.value)
   if (!tokenCookie.value) tokenCookie.value = data.value.auth.token
   if (!userCookie.value) userCookie.value = { name: data.value.auth.user.name }
   message.value = 'Login successful'
