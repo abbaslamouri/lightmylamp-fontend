@@ -1,8 +1,11 @@
 <script setup>
+const config = useRuntimeConfig()
+
 const route = useRoute()
 const { fetchAll, saveMedia, saveDoc, deleteDoc, deleteDocs } = useHttp()
 const { message, errorMsg, showMediaSelector, galleryMedia } = useAppState()
 const selectedMedia = ref([])
+const toggleSlideout = ref(false)
 const media = ref([])
 const count = ref(0)
 const totalCount = ref(0)
@@ -10,7 +13,7 @@ const page = ref(1)
 const perPage = ref(350)
 const keyword = ref('')
 const showDropZone = ref(false)
-const fields = 'id, name, slug, originalName, folder, path, mimetype'
+const fields = 'id, name, slug, originalName, folder, path, mimetype, altText, caption'
 let response = ''
 
 const mediaSort = reactive({
@@ -45,6 +48,7 @@ const pages = computed(() =>
 const fetchMedia = async () => {
   selectedMedia.value = []
   response = await fetchAll('media', params.value)
+  console.log(response)
   media.value = response.docs
   count.value = response.results
   totalCount.value = response.totalCount
@@ -110,6 +114,15 @@ const deleteMedia = async () => {
   }
 }
 
+const saveSelectedImage = async () => {
+  console.log(selectedMedia.value[0])
+  const response = await saveDoc('media', selectedMedia.value[0])
+  console.log(response)
+  if (!response) return
+  message.value = 'Media updated succesfully'
+  toggleSlideout.value = false
+}
+
 const handleSearch = async (searchKeyword) => {
   page.value = 1
   keyword.value = searchKeyword
@@ -129,6 +142,7 @@ const selectMediaType = async (event) => {
 const toggleSelectAll = (event) => {
   selectedMedia.value = event ? media.value : []
 }
+
 await fetchMedia()
 </script>
 
@@ -146,6 +160,7 @@ await fetchMedia()
           @searchKeywordSelected="handleSearch"
           @toggleSelectAll="toggleSelectAll"
           @selectMediaType="selectMediaType"
+          @toggleSlideout="toggleSlideout = !toggleSlideout"
         />
         <transition name="dropZone">
           <MediaDropZone
@@ -176,6 +191,49 @@ await fetchMedia()
       <button class="btn btn__secondary cancel px-2 py-1" @click="$emit('mediaSelectCancel')">Cancel</button>
       <button class="btn btn__primary px-2 py-1" @click="setSelectedMedia">Select</button>
     </div>
+    <Slideout v-if="toggleSlideout" @closeSlideout="toggleSlideout = false">
+      <template #header>
+        <h3>Edit Image</h3>
+      </template>
+      <template #default>
+        <div class="flex-row gap-2 p-4">
+          <div class="w-20 h-20">
+            <img
+              class="w-full h-full contain"
+              :src="`${config.backendUrl}/${selectedMedia[0].path}`"
+              :alt="`${selectedMedia[0].originalName} Photo`"
+            />
+          </div>
+          <div class="flex-1">
+            <div class="">
+              <FormsBaseInput label="Name" placeholder="Name" :required="true" v-model="selectedMedia[0].name" />
+            </div>
+            <div class="flex-1">
+              <FormsBaseInput
+                label="Alt Text"
+                placeholder="Alt Text"
+                :required="true"
+                v-model="selectedMedia[0].altText"
+              />
+            </div>
+            <div class="flex-1">
+              <FormsBaseInput
+                label="Caption"
+                placeholder="Caption"
+                :required="true"
+                v-model="selectedMedia[0].caption"
+              />
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex-row gap-2 justify-end">
+          <button class="btn btn__secondary px-2 py-1" @click="toggleSlideout = !toggleSlideout">Cancel</button>
+          <button class="btn btn__primary px-2 py-1" @click="saveSelectedImage">Save</button>
+        </div>
+      </template>
+    </Slideout>
   </div>
 </template>
 

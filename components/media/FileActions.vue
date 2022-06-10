@@ -18,6 +18,7 @@ const emit = defineEmits([
   'searchKeywordSelected',
   'toggleSelectAll',
   'selectMediaType',
+  'toggleSlideout',
 ])
 
 const mediaToDisplay = ref('all')
@@ -33,7 +34,18 @@ const mediaToDisplay = ref('all')
       <div class="flex-row gap-4">
         <Sort :sort="sort" :sortOptions="sortOptions" @toggleSort="$emit('toggleSort', $event)" />
         <div class="flex-row items-center gap-2 min-w-60">
-          <button class="btn" v-if="selectedMedia.length" @click="$emit('deleteMedia')">
+          <button
+            class="bg-slate-50 border border-transparent cursor-pointer"
+            v-if="selectedMedia.length === 1"
+            @click="$emit('toggleSlideout')"
+          >
+            <IconsEditFill class="fill-green-800" />
+          </button>
+          <button
+            class="bg-slate-50 border border-transparent cursor-pointer"
+            v-if="selectedMedia.length"
+            @click="$emit('deleteMedia')"
+          >
             <IconsDeleteFill class="fill-red-600" />
           </button>
         </div>

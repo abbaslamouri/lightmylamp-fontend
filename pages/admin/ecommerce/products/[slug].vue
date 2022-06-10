@@ -10,11 +10,6 @@ const { fetchAll, saveMedia, saveDoc, deleteDocs } = useHttp()
 const route = useRoute()
 const router = useRouter()
 
-// const product = ref()
-const showAttributesSlideout = ref(false)
-const showVariantsSlideout = ref(false)
-const showDropZone = ref(false)
-const galleryIntro = 'This image gallery contains all images associated with this product.'
 let response = null
 const product = useState('product', () => {
   return { productType: 'variable', gallery: [], categories: [], attributes: [], variants: [] }
@@ -29,28 +24,6 @@ if (slug) {
     response = await fetchAll('variants', { product: product.value.id })
     if (response.docs) product.value.variants = response.docs
   }
-}
-const addImagesToGallery = async (media) => {
-  console.log(media)
-  for (const prop in media) {
-    const index = product.value.gallery.findIndex((m) => m.id == media[prop].id)
-    if (index === -1) {
-      product.value.gallery.push(media[prop])
-    }
-  }
-  console.log(product.value)
-  // if (!gallery.length) return
-  // const formData = new FormData()
-  // for (const prop in gallery) {
-  //   formData.append('gallery', gallery[prop])
-  // }
-  // response = await saveMedia(formData)
-  // console.log(response)
-  // if (!Object.values(response).length) return
-  // for (const prop in response.media) {
-  //   product.value.gallery.push(response.media[prop])
-  // }
-  // saveProduct()
 }
 
 const saveProduct = async () => {
@@ -71,7 +44,7 @@ const saveProduct = async () => {
   // if (response) product.value = response
 }
 
-// const handleNewMediaSelectBtnClicked = () => {
+// const showMediaUploader = () => {
 //   mediaReference.value = 'productMedia'
 //   showMediaSelector.value = true
 // }
@@ -92,8 +65,7 @@ const saveProduct = async () => {
 watch(
   () => galleryMedia.value,
   (currentVal) => {
-    console.log(currentVal)
-    if (mediaReference.value === 'productMedia') addImagesToGallery(currentVal)
+    if (mediaReference.value === 'productMedia') product.value.gallery[0] = currentVal[0]
   },
   { deep: true }
 )
@@ -102,7 +74,6 @@ watch(
 <template>
   <div class="hfull flex-col items-center gap-2 p-3">
     <Title>{{ pageTitle }}</Title>
-    <!-- {{ product }} -->
     <header class="flex-col gap-2 w-full max-width-130">
       <div class="go-back" id="product-go-back">
         <NuxtLink class="admin-link" :to="{ name: 'admin-ecommerce-products' }">
@@ -120,10 +91,10 @@ watch(
         <EcommerceAdminProductPrice :product="product" @updatePrice="product.value = { ...product.value, ...$event }" />
         <EcommerceAdminProductEligibility />
         <EcommerceAdminProductNextHigherAssembly />
-        <EcommerceAdminProductStockManagement
+        <!-- <EcommerceAdminProductStockManagement
           :product="product"
           @updateStock="product.value = { ...product.value, ...$event }"
-        />
+        /> -->
 
         <!-- <EcommerceAdminProductAttributesContent
           v-if="product.id && product.productType === 'variable'"
@@ -155,9 +126,7 @@ watch(
       <div class="right-sidebar">
         <EcommerceAdminProductRightSidebar @productStatusUpdated="product.status = $event" @saveProduct="saveProduct" />
         <section class="admin-image-gallery shadow-md p-2 flex-col gap-2 bg-white" id="image-gallery">
-          <EcommerceAdminImageGallery
-            :gallery="product.gallery"
-          />
+          <EcommerceAdminImageGallery :gallery="product.gallery" />
         </section>
       </div>
     </main>

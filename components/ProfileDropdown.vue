@@ -1,19 +1,17 @@
 <script setup>
-const { user, token, isAuthenticated, logout } = useAuth()
+const { user, token, isAuthenticated, signout } = useAuth()
 const { errorMsg, message } = useAppState()
 const showProfileDropdown = ref(false)
 
-const signout = async () => {
+const lougout = async () => {
   showProfileDropdown.value = false
-
-  const response = await logout()
-  errorMsg.value = null
-  message.value = null
-  if (response.ok === false) return (errorMsg.value = response.errorMsg)
-  token.value = null
-  isAuthenticated.value = false
-  if (process.client) localStorage.removeItem('cart')
-  message.value = 'You are logged out'
+  const response = await signout()
+  console.log(response)
+  if (!response) return
+  // token.value = null
+  // isAuthenticated.value = false
+  // if (process.client) localStorage.removeItem('cart')
+  // message.value = 'You are logged out'
 }
 </script>
 
@@ -32,8 +30,8 @@ const signout = async () => {
     >
       <h3 class="">My Accoun</h3>
       <ul>
-        <li v-if="user.role === 'admin'">
-          <NuxtLink :to="{ name: `admin` }">Admin</NuxtLink>
+        <li v-if="user.role !== 'admin'">
+          <NuxtLink :to="{ name: `admin` }">Admin Dashboard</NuxtLink>
         </li>
         <li>
           <NuxtLink :to="{ name: `admin` }">Order History</NuxtLink>
@@ -45,7 +43,7 @@ const signout = async () => {
           <NuxtLink :to="{ name: `admin` }">Addresses?</NuxtLink>
         </li>
       </ul>
-      <button class="btn btn__secondary py-05 px1" @click="signout">Sign out</button>
+      <button class="btn btn__secondary py-05 px1" @click="lougout">Sign out</button>
     </div>
     <div class="overlay" v-if="showProfileDropdown" @click="showProfileDropdown = !showProfileDropdown"></div>
   </div>

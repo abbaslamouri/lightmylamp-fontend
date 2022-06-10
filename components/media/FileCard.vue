@@ -14,7 +14,7 @@ const config = useRuntimeConfig()
     @mouseenter="$event.target.classList.add('hovered')"
     @mouseleave="$event.target.classList.remove('hovered')"
   >
-    <div class="h-16 w-16" v-if="file.mimetype.includes('image')">
+    <div class="h-16 w-16 border border-slate-400 br-3" v-if="file.mimetype.includes('image')">
       <img v-if="file.name === 'spinner.gif'" class="w-full h-full contain" :src="`${config.backendUrl}/spinner.gif`" />
       <img v-else-if="file.path" class="w-full h-full contain" :src="`${config.backendUrl}/${file.path}`" />
       <img v-else class="w-full h-full contain" :src="`${config.backendUrl}/placeholder.png`" />

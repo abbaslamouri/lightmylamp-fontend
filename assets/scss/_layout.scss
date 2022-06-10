@@ -64,6 +64,10 @@
   top: 0;
 }
 
+.top-1 {
+  top: 1rem;
+}
+
 .top--05 {
   top: -0.5rem;
 }
@@ -84,12 +88,20 @@
   right: 1rem;
 }
 
+.right-1 {
+  right: 1rem;
+}
+
 .right-2 {
   right: 2rem;
 }
 
 .right-4 {
   right: 4rem;
+}
+
+.top-25-per {
+  top: 25%;
 }
 
 .top-50-per {
@@ -106,4 +118,8 @@
 
 .left-1 {
   left: 1rem;
+}
+
+.right--25-per {
+  right: -25%;
 }

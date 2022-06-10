@@ -66,7 +66,7 @@ const useHttp = () => {
     // //     ? useCookie('auth').value.token
     // //     : null
     // try {
-    //   const { data, pending, error } = await useFetch(`${config.API_URL}/${resource}/${id}`, {
+    //   const { data, pending, error } = await useFetch(`${config.API_Url}/${resource}/${id}`, {
     //     headers: { Authorization: `Bearer ${token.value}` },
     //   })
     //   // console.log(data.value)

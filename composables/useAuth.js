@@ -1,6 +1,6 @@
 const useAuth = () => {
-  const { errorMsg, message } = useAppState()
   const config = useRuntimeConfig()
+  const { errorMsg, message } = useAppState()
 
   const user = useState('user', () => (useCookie('user') && useCookie('user').value ? useCookie('user').value : {}))
 
@@ -16,12 +16,21 @@ const useAuth = () => {
     useCookie('user').value && useCookie('user').value.role === 'admin' ? true : false
   )
 
-  const signup = async (user) => {
+  const getErrorStr = (errors) => {
+    console.log('MYERROR', errors)
+    let errorStr = ''
+    for (const prop in errors) {
+      errorStr = `${errorStr}<li>${errors[prop].message}</li>`
+    }
+    return `<ul>${errorStr}</ul>`
+  }
+
+  const signup = async (payload) => {
     errorMsg.value = ''
     try {
       const { data, pending, error } = await useFetch(`http://localhost:5000/v1/auth/signup`, {
         method: 'POST',
-        body: { ...user },
+        body: { ...payload },
       })
       if (error.value) throw error.value
       return data.value
@@ -36,22 +45,36 @@ const useAuth = () => {
     }
   }
 
-  const signin = async (user) => {
-    errorMsg.value = null
-    message.value = null
+  const signin = async (payload) => {
+    errorMsg.value = ''
+    message.value = ''
+    console.log(payload)
     try {
       const response = await fetch(`${config.apiUrl}/auth/signin`, {
         method: 'POST',
-        body: user,
+        body: JSON.stringify(payload),
+        headers: new Headers({
+          'Content-Type': 'application/json',
+          // Authorization: `Bearer ${token.value}`,
+        }),
       })
-      console.log(response)
-      if (response.ok) return await response.json()
+      if (response.ok) {
+        const data = await response.json()
+        const tokenCookie = useCookie('token', { maxAge: data.cookieExpires * 24 * 60 * 60 })
+        const userCookie = useCookie('user', { maxAge: data.cookieExpires * 24 * 60 * 60 })
+        tokenCookie.value = data.token
+        userCookie.value = data.user
+        user.value = userCookie.value
+        token.value = tokenCookie.value
+        isAuthenticated.value = true
+        return true
+      }
       if (!response.headers.get('content-type')?.includes('application/json')) throw 'Something went terribly wrong'
       throw getErrorStr((await response.json()).errors)
     } catch (err) {
       console.log('MYERROR', err)
       errorMsg.value = err
-      return {}
+      return false
     }
   }
 
@@ -59,7 +82,7 @@ const useAuth = () => {
     errorMsg.value = ''
     message.value = ''
     try {
-      const { data, pending, error } = await useFetch(`${config.API_URL}/auth/completeSignup/${token}`, {
+      const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/completeSignup/${token}`, {
         method: 'PATCH',
         body: { ...user },
       })
@@ -78,7 +101,7 @@ const useAuth = () => {
 
   // const signin = async (user) => {
   //   try {
-  //     const { data, pending, error } = await useFetch(`${config.API_URL}/auth/signin`, {
+  //     const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/signin`, {
   //       method: 'POST',
   //       body: user,
   //     })
@@ -96,14 +119,14 @@ const useAuth = () => {
   // }
 
   const fetchLoggedInUser = async () => {
-    errorMsg.value = null
-    message.value = null
+    errorMsg.value = ''
+    message.value = ''
     const token =
       useCookie('auth') && useCookie('auth').value && useCookie('auth').value.token
         ? useCookie('auth').value.token
         : null
     try {
-      const { data, pending, error } = await useFetch(`${config.API_URL}/users/fetchLoggedIn`, {
+      const { data, pending, error } = await useFetch(`${config.apiUrl}/users/fetchLoggedIn`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (error.value) throw error.value
@@ -130,7 +153,7 @@ const useAuth = () => {
         ? useCookie('auth').value.token
         : null
     try {
-      const { data, pending, error } = await useFetch(`${config.API_URL}/users/updateLoggedInData`, {
+      const { data, pending, error } = await useFetch(`${config.apiUrl}/users/updateLoggedInData`, {
         method: 'PATCH',
         body: payload,
         headers: { Authorization: `Bearer ${token}` },
@@ -152,11 +175,11 @@ const useAuth = () => {
     errorMsg.value = ''
     message.value = ''
     try {
-      const { data, pending, error } = await useFetch(`${config.API_URL}/auth/forgotpassword`, {
+      const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/forgotpassword`, {
         method: 'POST',
         body: {
           email,
-          passwordResetUrl: `${config.BASE_URL}/auth/resetpassword`,
+          passwordResetUrl: `${config.BASE_Url}/auth/resetpassword`,
           emailSubject: 'Your password reset token (valid for 1 hour)',
         },
       })
@@ -181,7 +204,7 @@ const useAuth = () => {
     message.value = ''
     console.log(payload)
     try {
-      const { data, pending, error } = await useFetch(`${config.API_URL}/auth/resetpassword/${payload.token}`, {
+      const { data, pending, error } = await useFetch(`${config.apiUrl}/auth/resetpassword/${payload.token}`, {
         method: 'PATCH',
         body: {
           password: payload.password,
@@ -200,6 +223,39 @@ const useAuth = () => {
         errorMsg.value = err.data && err.data.message ? err.data.message : err.message ? err.message : ''
         return false
       }
+    }
+  }
+
+  const signout = async () => {
+    errorMsg.value = ''
+    message.value = ''
+    let response
+    console.log(config.apiUrl)
+    try {
+      response = await fetch(`${config.apiUrl}/auth/signout`, {
+        method: 'POST',
+        headers: new Headers({
+          'Content-Type': 'application/json',
+          // Authorization: `Bearer ${token && token.value ? token.value : ''}`,
+        }),
+      })
+      if (response.ok) {
+        const tokenCookie = useCookie('token', { maxAge: 0 })
+        const userCookie = useCookie('user', { maxAge: 0 })
+        tokenCookie.value = ''
+        userCookie.value = ''
+        user.value = ''
+        token.value = ''
+        isAuthenticated.value = false
+        return true
+      }
+      if (!response.headers.get('content-type')?.includes('application/json')) throw response.statusText
+      throw getErrorStr((await response.json()).errors)
+    } catch (err) {
+      console.log('MYERROR', err)
+      errorMsg.value = err
+      console.log(errorMsg.value)
+      return false
     }
   }
 
@@ -257,6 +313,7 @@ const useAuth = () => {
     signup,
     finishSignup,
     signin,
+    signout,
     fetchLoggedInUser,
     updateLoggedInUserData,
     forgotPassword,

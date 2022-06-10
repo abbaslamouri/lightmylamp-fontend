@@ -1,5 +1,5 @@
 <script setup>
-const { isAuthenticated, user } = useAuth()
+const { isAuthenticated } = useAuth()
 const showAdminSidebar = ref(false)
 
 const checkScreen = () => {
@@ -24,7 +24,7 @@ if (process.client) {
       </aside>
     </transition>
     <main :class="{ 'h-full': !showAdminSidebar }">
-      <header class="flex-row items-center justify-between px-2 text-slate-50">
+      <header class="flex-row items-center justify-between px-2 py-2 text-slate-50">
         <MobileNavToggler @hideAdminSidebar="showAdminSidebar = !showAdminSidebar" />
         <div>
           <LoginDropdown v-if="!isAuthenticated" />

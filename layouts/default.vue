@@ -1,28 +1,28 @@
 <script setup>
-// const { isAuthenticated } = useAuth()
+const { isAuthenticated } = useAuth()
 // const { showCartSlideout } = useAppState()
 </script>
 
 <template>
   <div class="app flex-col justidy-between min-h-100vh">
-    <!-- <header class="sticky top-0 z-9">
-      <EcommerceCheckoutFreeShipping />
+    <header class="sticky top-0 z-9">
+      <FreeShipping />
       <div class="bg-stone-800 flex-row items-center justify-center py-1">
         <div class="w-996p flex-row items-center justify-between">
           <Branding />
-          <div class="flex-row gap-2 items-center">
+          <div class="flex-row gap-2 items-center text-slate-50">
             <div>
-              <AuthLoginDropdown v-if="!isAuthenticated" />
-              <AuthProfileDropdown v-else />
+              <LoginDropdown v-if="!isAuthenticated" />
+              <ProfileDropdown v-else />
             </div>
-            <EcommerceCheckoutNavCart />
+            <!-- <EcommerceCheckoutNavCart /> -->
           </div>
         </div>
       </div>
       <nav class="nav">
         <MainNav />
       </nav>
-    </header> -->
+    </header>
     <main class="flex-1 flex-col">
       <slot />
     </main>

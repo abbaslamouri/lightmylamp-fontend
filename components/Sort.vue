@@ -32,7 +32,10 @@ watch(
     </div>
     <div class="flex-row items-center gap-05">
       <span>Sort Order</span>
-      <button class="btn" @click="currentSort.order == '-' ? (currentSort.order = ``) : (currentSort.order = `-`)">
+      <button
+        class="bg-slate-50 border border-transparent cursor-pointer"
+        @click="currentSort.order == '-' ? (currentSort.order = ``) : (currentSort.order = `-`)"
+      >
         <IconsSouth class="w-2 h-2 fill-sky-600" v-if="currentSort.order == '-'" />
         <IconsNorth class="w-2 h-2 fill-sky-600" v-else />
       </button>

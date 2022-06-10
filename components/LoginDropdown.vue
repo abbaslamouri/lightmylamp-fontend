@@ -2,7 +2,7 @@
 const config = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
-const { user, token, jwt, isAuthenticated, login } = useAuth()
+const { user, token, isAuthenticated, signin } = useAuth()
 const { errorMsg, message } = useAppState()
 const showAuthDropdown = ref(false)
 const formUser = reactive({
@@ -15,36 +15,9 @@ const signup = async () => {
   showAuthDropdown.value = false
 }
 
-const signin = async () => {
+const login = async () => {
   showAuthDropdown.value = false
-  errorMsg.value = null
-  message.value = null
-  const {
-    data,
-    pending: loading,
-    error,
-  } = await useFetch(`${config.apiUrl}/auth/signin`, {
-    method: 'POST',
-    body: { ...formUser },
-  })
-  if (error.value && error.value.data) {
-    console.log('MYERROR', error.value.data)
-    errorMsg.value = ''
-    for (const prop in error.value.data.errors) {
-      errorMsg.value = `${errorMsg.value}<li>${error.value.data.errors[prop].message}</li>`
-    }
-    errorMsg.value = `<ul>${errorMsg.value}</ul>`
-  }
-  console.log(data.value)
-  const tokenCookie = useCookie('token', { maxAge: data.value.cookieExpires * 24 * 60 * 60 })
-  const userCookie = useCookie('user', { maxAge: data.value.cookieExpires * 24 * 60 * 60 })
-  console.log('COOKIE', tokenCookie.value)
-  if (!tokenCookie.value) tokenCookie.value = data.value.auth.token
-  if (!userCookie.value) userCookie.value = { name: data.value.auth.user.name }
-  message.value = 'Login successful'
-  user.value = userCookie.value
-  token.value = tokenCookie.value
-  isAuthenticated.value = true
+  await signin(formUser)
 }
 
 const forgotPassword = async () => {
@@ -79,7 +52,7 @@ const forgotPassword = async () => {
             <IconsChevronRight />
           </button>
         </div>
-        <button class="btn btn__secondary w-full flex-row justify-between px-1 py-05 text-xs" @click.prevent="signin">
+        <button class="btn btn__secondary w-full flex-row justify-between px-1 py-05 text-xs" @click.prevent="login">
           <p>Sign in</p>
           <IconsChevronRight />
         </button>

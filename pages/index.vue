@@ -1,19 +1,13 @@
 <script setup>
+const title = ref('Main | YRL')
 const config = useRuntimeConfig()
-const ping = ref({})
-console.log(config.apiUrl)
-const fetchData = async () => {
-	const { data } = await useFetch(`/ping`, { baseURL: config.apiUrl })
-	console.log(data.value)
-}
 </script>
 
 <template>
-	<div>
-		<button @click="fetchData">Fetch Dataccxc</button>
-		<img :src="`https://lightmylamp.com/api/uploads/1653562126299-Pastels-1024x697.webp`" />
-		<!-- {{ data }} -->
-	</div>
+  <div>
+    <Title>{{ title }}</Title>
+    Hello
+  </div>
 </template>
 
 <style lang=""></style>

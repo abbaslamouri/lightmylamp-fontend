@@ -9,10 +9,6 @@ const product = useState('product')
       <div></div>
     </div>
     <div class="flex-row gap-2">
-      <div class="flex-1">
-        <FormsBaseInput label="ACS Part Number" placeholder="ACS Part Number" :required="true" v-model="product.name" />
-      </div>
-      <FormsBaseToggle v-model="product.active" label="Active" />
       <!-- <FormsBaseSelect
         nullOption="Select Product Type"
         label="Product Type"
@@ -24,6 +20,9 @@ const product = useState('product')
       /> -->
     </div>
     <div class="flex-1 flex-row gap-2">
+      <div class="flex-1">
+        <FormsBaseInput label="ACS Part Number" placeholder="ACS Part Number" :required="true" v-model="product.name" />
+      </div>
       <div class="flex-1">
         <FormsBaseInput label="OEM" placeholder="OEM" :required="true" v-model="product.oemPartNumber.parent.name" />
       </div>
