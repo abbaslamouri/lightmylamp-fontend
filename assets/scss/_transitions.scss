@@ -12,7 +12,27 @@
 
 .slideout-enter-active,
 .slideout-leave-active {
-  transition: all .2s ease;
+  transition: all 0.3s ease;
+}
+
+.slideup-enter-from {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.slideup-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.slideup-enter-to,
+.slideup-leave-from {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slideup-enter-active,
+.slideup-leave-active {
+  transition: all 0.2s ease;
 }
 
 .dropdown-leave-from,

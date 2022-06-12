@@ -1,6 +1,5 @@
 <template>
-  <div class="flex-col justify-center border border-red">&copy; YRL Consulting, LLC</div>
+  <div class="flex-col justify-center">&copy; YRL Consulting, LLC</div>
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

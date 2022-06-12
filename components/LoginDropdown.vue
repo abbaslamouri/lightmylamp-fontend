@@ -31,11 +31,11 @@ const forgotPassword = async () => {
     <div class="overlay" v-if="showAuthDropdown" @click="showAuthDropdown = !showAuthDropdown"></div>
     <div class=" ">
       <div
-        class="header flex-row items-center gap-1 text-xs border border-slate-50 py-05 px-1 cursor-pointer br-3 relative z-99"
+        class="header flex-row items-center gap-1 text-xs text-slate-900 py-05 px-1 cursor-pointer br-3 relative z-99"
         :class="{ selected: showAuthDropdown }"
         @click="showAuthDropdown = !showAuthDropdown"
       >
-        <IconsPersonFill class="fill-slate-50" />
+        <IconsPersonFill class="fill-slate-900" />
         <h3 class="font-light uppercase">Sign in / Create acount</h3>
       </div>
       <form class="shadow-md flex-col gap-2 bg-slate-50 p-2 absolute z-99 text-slate-800" v-if="showAuthDropdown">
@@ -70,9 +70,11 @@ const forgotPassword = async () => {
 @import '@/assets/scss/variables';
 
 .header {
+  border: 1px solid $slate-600;
   &:hover,
   &.selected {
-    background-color: $slate-50;
+    border: 1px solid #fff;
+    background-color: #fff;
     color: $slate-800;
     border-radius: 3px 3px 0 0;
 

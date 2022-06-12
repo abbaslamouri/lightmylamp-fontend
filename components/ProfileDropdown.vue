@@ -18,10 +18,10 @@ const lougout = async () => {
 <template>
   <div class="profile-dropdown relative">
     <div
-      class="header flex-row items-center gap-1 text-xs border border-slate-50 py-05 px-1 cursor-pointer br-3 relative z-99"
+      class="header flex-row items-center gap-1 text-slate-900 text-xs py-05 px-1 cursor-pointer br-3 relative z-99"
       v-bind:class="{ selected: showProfileDropdown }"
     >
-      <IconsPersonFill class="fill-slate-50" />
+      <IconsPersonFill class="fill-slate-900" />
       <h3 class="font-light uppercase" @click="showProfileDropdown = !showProfileDropdown">Welcome {{ user.name }}</h3>
     </div>
     <div
@@ -53,9 +53,11 @@ const lougout = async () => {
 @import '@/assets/scss/variables';
 
 .header {
+  border: 1px solid $slate-600;
   &:hover,
   &.selected {
-    background-color: white;
+    border: 1px solid #fff;
+    background-color: #fff;
     color: $slate-800;
     border-radius: 3px 3px 0 0;
 

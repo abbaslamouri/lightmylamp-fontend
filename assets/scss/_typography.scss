@@ -24,6 +24,10 @@
   font-size: 3rem; /* 18px */
   // line-height: 1.75rem; /* 28px */
 }
+.text-4xl {
+  font-size: 4rem; /* 48px */
+  // line-height: 1;
+}
 
 .text-5xl {
   font-size: 5rem; /* 48px */
@@ -120,4 +124,36 @@
 
 .white-space-nowrap {
   white-space: nowrap;
+}
+
+.leading-3 {
+  line-height: 1.2rem;
+}
+
+.leading-4 {
+  line-height: 1.6rem;
+}
+
+.leading-5 {
+  line-height: 2rem;
+}
+
+.leading-6 {
+  line-height: 2.4rem;
+}
+
+.leading-7 {
+  line-height: 2.8rem;
+}
+
+.leading-8 {
+  line-height: 3.2rem;
+}
+
+.leading-9 {
+  line-height: 3.6rem;
+}
+
+.leading-10 {
+  line-height: 4rem;
 }

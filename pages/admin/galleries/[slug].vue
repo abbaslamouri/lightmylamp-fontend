@@ -22,11 +22,14 @@ const gallery = useState('gallery', () => {
 const slug = route.params.slug === '_' ? null : route.params.slug
 
 response = await fetchAll('galleries', { slug })
-if (response.docs) gallery.value = response.docs[0]
-// else gallery.value = response.docs[0]
+console.log(response)
+if (response.docs.length) gallery.value = response.docs[0]
+// else gallery.value = { sortOrder: 0, gallery: [] }
 
 // response = await fetchAll('sliders')
 // sliders.value = response.docs
+
+console.log(gallery.value)
 
 const addImagesToGallery = async (images) => {
   if (!images.length) return
