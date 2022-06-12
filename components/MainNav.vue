@@ -1,31 +1,33 @@
 <script setup>
 const navLinkItems = ref([
   {
-    title: 'Home',
+    name: 'Home',
+    show: false,
+    link: 'index',
+  },
+  {
+    name: 'Our parts',
+    show: false,
+    link: 'ecommerce-products',
+  },
+  {
+    name: 'Capabilities',
     show: false,
   },
   {
-    title: 'Our parts',
+    name: 'News',
     show: false,
   },
   {
-    title: 'Capabilities',
+    name: 'About ACS',
     show: false,
   },
   {
-    title: 'News',
+    name: 'Account',
     show: false,
   },
   {
-    title: 'About ACS',
-    show: false,
-  },
-  {
-    title: 'Account',
-    show: false,
-  },
-  {
-    title: 'Contact',
+    name: 'Contact',
     show: false,
   },
 ])
@@ -34,11 +36,15 @@ const navLinkItems = ref([
 <template>
   <div class="flex-row justify-center bg-slate-800">
     <ul class="w-996p flex-row justify-center">
-      <li class="item w-full text-slate-50" v-for="item in navLinkItems" :key="item.title">
-        <div class="menu-item text-center py-1 text-sm uppercase">
-          <component :is="item.icon"></component>
+      <li class="item w-full text-slate-50 flex-row justify-center items-center uppercase py-2" v-for="item in navLinkItems" :key="item.title">
+        <NuxtLink :to="{ name: item.link }">
+          <!-- <button class="btn btn__primary btn__pill px-2 py-05"> -->
+          {{ item.name }}
+          <!-- </button> -->
+        </NuxtLink>
+        <!-- <div class="menu-item text-center py-1 text-sm uppercase">
           <div>{{ item.title }}</div>
-        </div>
+        </div> -->
       </li>
     </ul>
   </div>
