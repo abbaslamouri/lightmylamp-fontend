@@ -6,6 +6,7 @@ const { errorMsg, message } = useAppState()
 const { fetchAll, deleteDoc, deleteDocs } = useHttp()
 
 const quantitySelectors = ref([])
+const listType = ref('tile')
 
 const showProductFiltersSlideout = ref(false)
 
@@ -133,15 +134,26 @@ await fetchAllProducts()
 
           <section class="flex-row justify-center">
             <div class="w-996p">
-              <!-- <EcommerceProductHero /> -->
+              <!-- <EcommerceProductsHero /> -->
               <EcommerceProductsFiltersAndViews
+                @setListType="listType = $event"
                 @toggleProductFiltersSlideout="showProductFiltersSlideout = !showProductFiltersSlideout"
               />
-              <div class="flex-col">
-                <EcommerceProductsCardList
+              <div
+                class="flex-col gap-4 justify-center items-center h-16 bg-center bg-no-repeat bg-size-cover"
+                :style="{ backgroundImage: `url('${config.backendUrl}/uploads/acshomepage-1654948453809.jpg')` }"
+              >
+                <h3 class="text-4xl text-slate-50 tracking-wider uppercase">Aviation Component Solutions</h3>
+                <h4 class="text-md text-slate-50 tracking-wider uppercase">
+                  Delivering the Difference Through Innovation and Integrity
+                </h4>
+              </div>
+              <div class="list" :class="{ list: listType == 'list', tile: listType == 'tile' }">
+                <EcommerceProductsCard
                   v-for="(product, i) in products"
                   :key="product.id"
                   :product="product"
+                  :listType="listType"
                   :showQuantitySelector="quantitySelectors[i]"
                   @toggleQuantitySelectors="toggleQuantitySelectors($event, i)"
                   @resetSelectQuantities="resetSelectQuantities"
@@ -177,4 +189,12 @@ await fetchAllProducts()
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.list {
+  &.tile {
+    display: flex;
+    flex-direction: columns;
+    flex-wrap: wrap;
+  }
+}
+</style>

@@ -1,7 +1,11 @@
 <script setup>
-const emit = defineEmits(['toggleProductFiltersSlideout'])
-
-const listType = ref('tile')
+const props = defineProps({
+  listType: {
+    type: String,
+    default: 'list',
+  },
+})
+const emit = defineEmits(['toggleProductFiltersSlideout', 'setListType'])
 </script>
 
 <template>
@@ -17,12 +21,12 @@ const listType = ref('tile')
       <span>View</span>
       <div class="icons flex-row gap-1">
         <IconsListTiled
-          @click="listType = 'tile'"
+          @click="$emit('setListType', 'tile')"
           class="icon fill-slate-400 cursor-pointer"
           :class="{ selected: listType === 'tile' }"
         />
         <IconsListBulleted
-          @click="listType = 'list'"
+          @click="$emit('setListType', 'list')"
           class="icon fill-slate-400 cursor-pointer"
           :class="{ selected: listType === 'list' }"
         />
